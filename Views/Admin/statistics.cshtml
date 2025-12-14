@@ -1,0 +1,135 @@
+@section Styles {
+    <link rel="stylesheet" href="~/cssadmin/statistics.css">
+
+    <link rel="stylesheet" href="~/cssadmin/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+}
+
+@{
+    ViewData["Title"] = "Quản Lý Bài Viết - Hệ Thống Thống kê";
+}
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@* ... (phần styles và ViewData giữ nguyên) ... *@
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    @* Truyền URL cho API vào JavaScript *@
+    <script>
+        const API_URL_GET_STATISTICS = '@Url.Action("GetStatisticsData", "Statistics", new { Area = "Admin" })';
+    </script>
+    <script src="~/js/jsadmin/statistics.js"></script>
+}
+<div class="app-container">
+    <!-- Sidebar -->
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <main class="content-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Thống Kê</h1>
+                <div class="page-actions">
+                    <div class="filter-group">
+                        <label for="time-range">Thời gian:</label>
+                        <select id="time-range" class="select-control">
+                            <option value="7">7 ngày</option>
+                            <option value="30" selected>30 ngày</option>
+                            <option value="90">90 ngày</option>
+                            <option value="365">365 ngày</option>
+                            <option value="all">Tất cả</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-secondary" id="exportReportBtn">
+                        <i class="fas fa-download"></i>
+                        Xuất báo cáo
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stats-card" id="newUsersCard">
+                    <div class="stats-card-content">
+                        <div>
+                            <p class="stats-card-label">Người dùng mới</p>
+                            <p class="stats-card-value">...</p>
+                        </div>
+                        <div class="stats-card-icon">
+                            <i class="fas fa-user-plus"></i>
+                        </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        <span class="stats-trend"></span> <span class="comparison-text"></span>
+                    </div>
+                </div>
+
+                <div class="stats-card" id="interactionRateCard">
+                    <div class="stats-card-content">
+                        <div>
+                            <p class="stats-card-label">Tỷ lệ tương tác</p>
+                            <p class="stats-card-value">...</p>
+                        </div>
+                        <div class="stats-card-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        <span class="stats-trend"></span> <span class="comparison-text"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Traffic Chart -->
+            <div class="chart-card">
+                <div class="chart-header">
+                    <h2 class="chart-title" id="trafficChartTitle">Lượng truy cập theo thời gian</h2>
+                    <div class="chart-actions">
+                        @* Bỏ legend tĩnh này nếu biểu đồ tự render legend dựa trên datasets *@
+                        <select id="traffic-interval" class="select-control">
+                            <option value="day">Theo ngày</option>
+                            <option value="week">Theo tuần</option>
+                            <option value="month" selected>Theo tháng</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="trafficChart"></canvas>
+                </div>
+            </div>
+            
+            <!-- Post Distribution Chart (formerly SourceChart) -->
+            <div class="chart-card">
+                 <h2 class="chart-title" id="postDistributionChartTitle">Phân bố bài viết theo loại</h2>
+                 <div class="chart-container">
+                     <canvas id="sourceChart"></canvas> <!-- Giữ ID cũ hoặc đổi nếu muốn -->
+                 </div>
+            </div>
+
+            <!-- User Interactions Chart -->
+            <div class="chart-card">
+                <h2 class="chart-title" id="userInteractionsChartTitle">Tương tác người dùng theo thời gian</h2>
+                <div class="chart-container">
+                    <canvas id="interactionsChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Top Posts Chart (formerly DeviceChart) -->
+            <div class="chart-card">
+                <h2 class="chart-title" id="topPostsChartTitle">Top 5 bài viết được xem nhiều nhất</h2>
+                <div class="chart-container">
+                    <canvas id="deviceChart"></canvas> <!-- Giữ ID cũ hoặc đổi nếu muốn -->
+                </div>
+            </div>
+
+            <!-- Location Distribution Chart (formerly AgeChart) -->
+            <div class="chart-card">
+                <h2 class="chart-title" id="locationDistributionChartTitle">Phân bố bài viết theo địa điểm</h2>
+                <div class="chart-container">
+                    <canvas id="ageChart"></canvas> <!-- Giữ ID cũ hoặc đổi nếu muốn -->
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

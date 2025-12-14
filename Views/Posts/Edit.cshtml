@@ -1,0 +1,206 @@
+@model TourismWeb.Models.Post
+
+@{
+    ViewData["Title"] = "Chỉnh sửa bài viết";
+    bool isAdmin = User.IsInRole("Admin");
+}
+
+<div class="container py-4">
+    <div class="card shadow-lg border-0 rounded-lg">
+        <div class="card-header bg-primary text-white">
+            <h3 class="text-center fw-bold my-2">
+                <i class="bi bi-pencil-square me-2"></i>Chỉnh sửa bài viết
+            </h3>
+        </div>
+        <div class="card-body">
+            <form asp-action="Edit" enctype="multipart/form-data">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <input type="hidden" asp-for="PostId" />
+                <input type="hidden" asp-for="UserId" />
+                <input type="hidden" asp-for="CreatedAt" />
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="SpotId" class="form-label mb-2">Địa điểm du lịch</label>
+                            <select asp-for="SpotId" class="form-select" asp-items="ViewBag.SpotId"></select>
+                            <span asp-validation-for="SpotId" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group mb-3">
+                            <label asp-for="TypeOfPost" class="form-label mb-2">Loại bài viết</label>
+                            <select asp-for="TypeOfPost" class="form-select">
+                                <option value="">-- Chọn loại --</option>
+                                <option value="Địa điểm">Địa điểm</option>
+                                <option value="Cẩm nang">Cẩm nang</option>
+                                <option value="Trải nghiệm">Trải nghiệm</option>
+                            </select>
+                            <span asp-validation-for="TypeOfPost" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Title" class="form-label mb-2">Tiêu đề</label>
+                    <input asp-for="Title" class="form-control" />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <!-- Main Image -->
+                <div class="form-group mb-4">
+                    <label class="form-label mb-2">Ảnh bìa chính</label>
+                    <div class="row">
+                        <div class="col-md-3">
+                            <img src="@Model.ImageUrl" id="currentMainImage" class="img-thumbnail" alt="Main Image"
+                                style="max-height: 150px; width: 100%; object-fit: cover;" />
+                        </div>
+                        <div class="col-md-9">
+                            <input type="file" name="mainImageFile" id="mainImageFile" class="form-control"
+                                accept="image/*" />
+                            <small class="form-text text-muted">Chọn ảnh mới nếu bạn muốn thay thế ảnh hiện tại.</small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Additional Images -->
+                <div class="form-group mb-4">
+                    <label class="form-label mb-2">Ảnh phụ</label>
+                    @if (Model.Images != null && Model.Images.Any())
+                    {
+                        <div class="row mb-3">
+                            @foreach (var img in Model.Images)
+                            {
+                                <div class="col-md-3 mb-3">
+                                    <div class="card h-100">
+                                        <img src="@img.ImageUrl" class="card-img-top" alt="Additional Image"
+                                            style="height: 120px; object-fit: cover;">
+                                        <div class="card-body p-2 text-center">
+                                            <div class="form-check">
+                                                <input type="checkbox" name="imagesToDelete" value="@img.PostImageId"
+                                                    class="form-check-input" id="delete-@img.PostImageId">
+                                                <label class="form-check-label" for="delete-@img.PostImageId">Xóa</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    <div>
+                        <input type="file" name="additionalImages" multiple class="form-control" accept="image/*" />
+                        <small class="form-text text-muted">Tải lên thêm ảnh minh họa (có thể chọn nhiều ảnh).</small>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label asp-for="Content" class="form-label mb-2">Nội dung chi tiết</label>
+                    <textarea asp-for="Content" class="form-control" rows="10"></textarea>
+                    <span asp-validation-for="Content" class="text-danger"></span>
+                </div>
+
+                @if (isAdmin)
+                {
+                    <div class="form-group mb-4">
+                        <label class="form-label mb-2">Trạng thái bài viết</label>
+                        <div class="d-flex">
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" asp-for="Status" id="status-pending"
+                                    value="@PostStatus.Pending" />
+                                <label class="form-check-label" for="status-pending">
+                                    <span class="badge bg-warning">Chờ duyệt</span>
+                                </label>
+                            </div>
+                            <div class="form-check me-4">
+                                <input class="form-check-input" type="radio" asp-for="Status" id="status-approved"
+                                    value="@PostStatus.Approved" />
+                                <label class="form-check-label" for="status-approved">
+                                    <span class="badge bg-success">Đã duyệt</span>
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" asp-for="Status" id="status-rejected"
+                                    value="@PostStatus.Rejected" />
+                                <label class="form-check-label" for="status-rejected">
+                                    <span class="badge bg-danger">Từ chối</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Sau khi chỉnh sửa, bài viết của bạn sẽ được gửi lại để kiểm duyệt.
+                    </div>
+                }
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a asp-action="@(isAdmin ? "Moderate" : "MyPosts")" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left me-1"></i> Quay lại
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Lưu thay đổi
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        // Preview main image before upload
+        document.getElementById('mainImageFile').addEventListener('change', function (e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    document.getElementById('currentMainImage').src = e.target.result;
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        // Show preview for additional images
+        document.querySelector('input[name="additionalImages"]').addEventListener('change', function (e) {
+            const previewContainer = document.createElement('div');
+            previewContainer.className = 'row mt-2';
+            previewContainer.id = 'additionalImagesPreview';
+
+            const existingPreview = document.getElementById('additionalImagesPreview');
+            if (existingPreview) {
+                existingPreview.remove();
+            }
+
+            if (e.target.files && e.target.files.length > 0) {
+                for (let i = 0; i < e.target.files.length; i++) {
+                    const file = e.target.files[i];
+
+                    const col = document.createElement('div');
+                    col.className = 'col-md-3 mb-2';
+
+                    const img = document.createElement('img');
+                    img.className = 'img-thumbnail';
+                    img.style.height = '120px';
+                    img.style.width = '100%';
+                    img.style.objectFit = 'cover';
+
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        img.src = e.target.result;
+                    }
+                    reader.readAsDataURL(file);
+
+                    col.appendChild(img);
+                    previewContainer.appendChild(col);
+                }
+
+                this.parentElement.appendChild(previewContainer);
+            }
+        });
+    </script>
+}

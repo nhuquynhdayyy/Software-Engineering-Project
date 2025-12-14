@@ -1,0 +1,921 @@
+@model TourismWeb.Models.User
+@using TourismWeb.Models 
+@section Styles {
+    <link rel="stylesheet" href="~/css/userprofile.css" asp-append-version="true" />
+}
+
+@{
+    ViewData["Title"] = "Trang cá nhân user";
+    var successMessage = TempData["SuccessMessage"] as string;
+    var errorMessage = TempData["ErrorMessage"] as string;
+
+}
+
+@* @if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        @errorMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+} *@
+
+<main>
+    <div class="profile-container">
+        <div class="profile-sidebar">
+            <div class="card-body p-4">
+               <div class="text-center mb-4">
+                   <div class="avatar-container position-relative mx-auto" style="width: 150px; height: 150px;">
+                      <!-- Current avatar display -->
+                <div class="rounded-circle overflow-hidden border border-3 border-light shadow-sm" style="width: 150px; height: 150px;">
+                    <img src="@Model.AvatarUrl" alt="@Model.FullName" class="w-100 h-100 object-fit-cover" id="avatarPreview">
+                </div>
+                
+                <!-- Camera icon button -->
+                    <div class="position-absolute bottom-0 end-0 bg-primary text-white p-2 rounded-circle shadow cursor-pointer" 
+                                 style="cursor: pointer; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; right: 5px; bottom: 5px; z-index: 10;" 
+                                 onclick="document.getElementById('avatarFile').click()">
+                                <i class="bi bi-camera-fill" style="font-size: 1.2rem;"></i>
+                    </div>
+                <!-- Hover overlay -->
+                <div class="avatar-overlay position-absolute top-0 start-0 w-100 h-100 rounded-circle d-flex align-items-center justify-content-center" 
+                     style="background: rgba(0,0,0,0.5); opacity: 0; transition: opacity 0.2s ease;"
+                     onclick="document.getElementById('avatarFile').click()">
+                    <i class="bi bi-camera-fill text-white fs-3"></i>
+                </div>
+            </div>
+        </div>
+
+        <form asp-controller="Profile" asp-action="UploadAvatar" method="post" enctype="multipart/form-data" id="avatarForm">
+        <input type="file" id="avatarFile" name="avatarFile" accept="image/*" class="d-none" onchange="handleFileChange(this)">
+            <div id="uploadingMessage" class="text-center mb-3 text-muted small d-none">
+                            Đang cập nhật ảnh đại diện...
+                        </div>
+                    </form>
+    </div>
+
+            <h2 class="profile-name">@Model.FullName</h2>
+
+            <!-- === PHẦN THÊM MỚI CHO BIO === -->
+    <div class="profile-bio-container text-center px-3 mb-3">
+        <!-- Hiển thị Bio hiện tại hoặc placeholder -->
+        <p class="profile-bio text-muted mb-1" id="displayBio">
+            @if (!string.IsNullOrEmpty(Model.Bio))
+            {
+                @Html.Raw(Model.Bio.Replace("\n", "<br />")) @* Hiển thị xuống dòng nếu có *@
+            }
+            else
+            {
+                <span class="fst-italic">Chưa có tiểu sử.</span>
+            }
+            <i class="bi bi-pencil-square ms-2 text-primary cursor-pointer" id="editBioIcon" title="Chỉnh sửa tiểu sử"></i>
+        </p>
+
+        <!-- Form chỉnh sửa Bio (ẩn ban đầu) -->
+        <div id="editBioForm" style="display: none;">
+            @Html.AntiForgeryToken() @* Thêm token ở đây cho AJAX *@
+            <textarea id="bioEditTextarea" class="form-control form-control-sm mb-2" rows="3" placeholder="Nhập tiểu sử của bạn...">@Model.Bio</textarea>
+            <div class="d-flex justify-content-center gap-2">
+                <button type="button" class="btn btn-sm btn-secondary" id="cancelBioBtn">Hủy</button>
+                <button type="button" class="btn btn-sm btn-primary" id="saveBioBtn">Lưu</button>
+            </div>
+             <div id="bioSavingMessage" class="text-center mt-2 text-muted small d-none">Đang lưu...</div>
+             <div id="bioErrorMessage" class="text-center mt-2 text-danger small d-none"></div>
+        </div>
+    </div>
+    <!-- === KẾT THÚC PHẦN BIO === -->
+
+            <div class="profile-stats">
+                <div class="stat-item">
+                    <div class="stat-number">@Model.Posts.Count</div>
+                    <div class="stat-label">Bài viết</div>
+                </div>
+            </div>
+
+            <ul class="profile-menu">
+                <li><a href="#thongtin-tai-khoan">Hồ sơ</a></li>
+                <li><a href="#bo-suu-tap">Bộ sưu tập ảnh</a></li>
+                <li><a href="#bai-viet">Bài viết của tôi</a></li>
+                <li><a href="#danh-gia">Đánh giá của tôi</a></li>
+                <li><a href="#binh-luan">Bình luận của tôi</a></li>
+                <li><a href="#dia-diem-yeu-thich">Địa điểm yêu thích</a></li>
+                <li><a href="#bai-viet-yeu-thich">Bài viết yêu thích</a></li>
+            </ul>
+        </div>
+
+        <div class="profile-content">
+            @if (!string.IsNullOrEmpty(successMessage))
+             {
+                 <div class="alert alert-success alert-dismissible fade show" role="alert">
+                           @successMessage
+                          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                 </div>
+             }
+             @if (!string.IsNullOrEmpty(errorMessage))
+             {
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @errorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+             }
+             @* Hiển thị tóm tắt lỗi validation từ ModelState *@
+             <div asp-validation-summary="ModelOnly" class="text-danger alert alert-danger"></div>
+            <div class="profile-tabs">
+                <div class="tab active" data-tab="account">Thông tin tài khoản</div>
+                <div class="tab" data-tab="security">Mật khẩu & Bảo mật</div>
+            </div>
+
+            <div id="account-tab" class="tab-content active">
+    <form asp-controller="Profile" asp-action="UpdateProfile" method="post">
+        @Html.AntiForgeryToken()
+
+        <div class="content-section" id="thongtin-tai-khoan">
+            <h3 class="section-title">Dữ liệu cá nhân</h3>
+            <div class="form-group">
+                <label class="form-label" for="FullNameInput">Tên đầy đủ</label>
+                <input type="text" id="FullNameInput" name="FullName" class="form-input form-control" value="@Model.FullName">
+                <span class="text-danger">@Html.ValidationMessage("FullName")</span>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label class="form-label">Ngày sinh</label>
+                    <div class="date-selects">
+                        @{
+                            var birthDate = Model.DateOfBirth;
+                            var day = birthDate?.Day ?? 0;
+                            var month = birthDate?.Month ?? 0;
+                            var year = birthDate?.Year ?? 0;
+
+                            if (ViewData.ModelState.TryGetValue("BirthDay", out var dayState) && dayState.AttemptedValue != null)
+                                int.TryParse(dayState.AttemptedValue, out day);
+                            if (ViewData.ModelState.TryGetValue("BirthMonth", out var monthState) && monthState.AttemptedValue != null)
+                                int.TryParse(monthState.AttemptedValue, out month);
+                            if (ViewData.ModelState.TryGetValue("BirthYear", out var yearState) && yearState.AttemptedValue != null)
+                                int.TryParse(yearState.AttemptedValue, out year);
+                        }
+
+                        <select class="form-select" name="BirthDay">
+                            <option value="0" selected="@(day == 0)">Ngày</option>
+                            @for (int i = 1; i <= 31; i++)
+                            {
+                                <option value="@i" selected="@(day == i)">@i</option>
+                            }
+                        </select>
+                        <select class="form-select" name="BirthMonth">
+                            <option value="0" selected="@(month == 0)">Tháng</option>
+                            @for (int i = 1; i <= 12; i++)
+                            {
+                                <option value="@i" selected="@(month == i)">Tháng @i</option>
+                            }
+                        </select>
+                        <select class="form-select" name="BirthYear">
+                            <option value="0" selected="@(year == 0)">Năm</option>
+                            @{
+                                int currentYear = DateTime.Now.Year;
+                                for (int i = currentYear; i >= currentYear - 100; i--)
+                                {
+                                    <option value="@i" selected="@(year == i)">@i</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <span class="text-danger">@Html.ValidationMessage("DateOfBirth")</span>
+                </div>
+            </div>
+
+            <div class="button-group mt-4">
+                <button type="reset" class="btn btn-outline">Hủy thay đổi</button>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </div>
+
+        <div class="content-section">
+            <h3 class="section-title">Email</h3>
+            <div class="email-item">
+                <p class="email-title" style="margin: 0;">@Model.Email</p>
+                <span class="notification-badge">Nơi nhận thông báo</span>
+            </div>
+            @if (string.IsNullOrEmpty(Model.Email))
+            {
+                <div class="button-group">
+                    <button class="btn btn-outline"><i class="icon-plus"></i> Thêm email</button>
+                </div>
+            }
+        </div>
+
+        <div class="content-section"> 
+                        <h3 class="section-title">Số di động</h3>
+                         <div class="form-group">
+                            <label class="form-label" for="PhoneNumberInput">Số di động</label>
+                            <input type="tel" id="PhoneNumberInput" name="PhoneNumber" class="form-input form-control" value="@Model.PhoneNumber">
+                            <span class="text-danger">@Html.ValidationMessage("PhoneNumber")</span>
+                            
+                            <div class="button-group mt-4"></div>
+                <button type="reset" class="btn btn-outline">Hủy thay đổi</button>
+                <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+                    @* @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                    {
+                        <div class="email-item">
+                            <div>
+                                <p class="email-title">@Model.PhoneNumber</p>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="button-group">
+                        <button class="btn btn-outline">
+                            <i class="icon-plus"></i>
+                            Thêm số di động
+                        </button>
+                    </div>
+                </div>
+            </div> *@
+
+            <div id="security-tab" class="tab-content @(ViewData["ActiveTab"] as string == "security" ? "active" : "")">
+                <form asp-controller="Profile" asp-action="UpdatePassword" method="post">
+                     @Html.AntiForgeryToken()
+
+                     <div class="content-section" id="cai-dat">
+                        <h3 class="section-title">Mật khẩu & Bảo mật</h3>
+                        <p class="card-description">Quản lý mật khẩu và các tùy chọn bảo mật cho tài khoản của bạn</p>
+                         @* Hiển thị lỗi chung từ ModelState nếu có *@
+                         <div asp-validation-summary="ModelOnly" class="text-danger alert alert-danger"></div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="CurrentPasswordInput">Mật khẩu hiện tại</label>
+                            <input type="password" id="CurrentPasswordInput" name="CurrentPassword" class="form-input form-control" required>
+                            <span class="text-danger">@Html.ValidationMessage("CurrentPassword")</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="NewPasswordInput">Mật khẩu mới</label>
+                            <input type="password" id="NewPasswordInput" name="NewPassword" class="form-input form-control" required>
+                            <span class="text-danger">@Html.ValidationMessage("NewPassword")</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="ConfirmPasswordInput">Xác nhận mật khẩu mới</label>
+                            <input type="password" id="ConfirmPasswordInput" name="ConfirmPassword" class="form-input form-control" required>
+                            <span class="text-danger">@Html.ValidationMessage("ConfirmPassword")</span>
+                        </div>
+
+                        <div class="button-group mt-3">
+                            <button type="submit" class="btn btn-primary">Cập nhật mật khẩu</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+                @* <div class="content-section">
+                    <h3 class="section-title">Xác thực hai yếu tố</h3>
+                    <p class="card-description">Tăng cường bảo mật cho tài khoản của bạn</p>
+
+                    <div class="toggle-item">
+                        <div>
+                            <p class="toggle-title">Xác thực qua SMS</p>
+                            <p class="toggle-description">Nhận mã xác thực qua tin nhắn SMS</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="toggle-item">
+                        <div>
+                            <p class="toggle-title">Xác thực qua ứng dụng</p>
+                            <p class="toggle-description">Sử dụng ứng dụng xác thực như Google Authenticator</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div> *@
+ @{
+    var defaultPostImageUrl = "/images/default-postImage.png";
+    var defaultReviewImageUrl = "/images/default-postImage.png";
+
+    List<object> allGalleryImageObjects = new List<object>();
+
+     // 1. Lấy ảnh từ Model.Reviews của User
+    if (Model?.Reviews != null && Model.Reviews.Any())
+    {
+         allGalleryImageObjects.AddRange(Model.Reviews
+            .Where(review => review.ImageUrl != null &&
+                             !string.IsNullOrEmpty(review.ImageUrl.Trim()) &&
+                             review.ImageUrl.Trim().ToLower() != defaultReviewImageUrl.ToLower())
+            .Select(review => new { // Tạo đối tượng ẩn danh
+                SourceType = "Review", // Thêm để dễ debug nếu cần
+                ImageUrl = review.ImageUrl,
+                AltText = $"Ảnh từ đánh giá cho {review.Spot?.Name ?? "Địa điểm"}",
+                CreatedAt = review.CreatedAt
+            }));
+    }
+    // 2. Lấy ảnh từ Model.Posts của User
+    if (Model?.Posts != null)
+    {
+        allGalleryImageObjects.AddRange(Model.Posts
+            .Where(post => post.ImageUrl != null &&
+                           !string.IsNullOrEmpty(post.ImageUrl.Trim()) &&
+                           post.ImageUrl.Trim().ToLower() != defaultPostImageUrl.ToLower())
+            .Select(post => new { // Tạo đối tượng ẩn danh
+                SourceType = "Post", // Thêm để dễ debug nếu cần
+                ImageUrl = post.ImageUrl,
+                AltText = $"Ảnh từ bài viết: {post.Title ?? (post.Spot?.Name ?? "Nội dung")}",
+                CreatedAt = post.CreatedAt
+            }));
+    }
+
+    // 3. Sắp xếp tất cả ảnh và lấy tối đa 8 ảnh
+    var imagesToDisplayInGallery = allGalleryImageObjects
+                                    .OrderByDescending(obj => (DateTime)obj.GetType().GetProperty("CreatedAt").GetValue(obj, null))
+                                    .Take(8)
+                                    .ToList();
+}
+
+
+            <div class="content-section" id="bo-suu-tap">
+                <h3 class="section-title">Bộ sưu tập ảnh</h3>
+                @if (imagesToDisplayInGallery.Any())
+                {
+        <div class="photo-grid" style="display: flex; flex-wrap: wrap; gap: 10px;">
+            @foreach (var galleryItemObj in imagesToDisplayInGallery)
+            {
+                var imageUrl = (string)galleryItemObj.GetType().GetProperty("ImageUrl").GetValue(galleryItemObj, null);
+                var altText = (string)galleryItemObj.GetType().GetProperty("AltText").GetValue(galleryItemObj, null);
+
+                <div class="photo-item" style="flex: 1 1 150px; max-width: 200px;">
+                    <img src="@(Url.Content(imageUrl))"
+                         alt="@altText"
+                         class="square-image" 
+                         onclick="openLightbox(this.src)" />
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p style="text-align: center; margin-top: 20px;">Chưa có ảnh nào từ bài viết hoặc đánh giá của bạn để hiển thị trong bộ sưu tập.</p>
+    }
+</div>
+
+
+            <div class="content-section" id="bai-viet"> @* ID khớp với href trong menu *@
+                <h3 class="section-title">Bài viết của tôi</h3>
+                <div class="my-posts"> 
+                    @if (Model.Posts == null || !Model.Posts.Any())
+                            {
+                                <div class="alert alert-info">
+                                    Bạn chưa có bài viết nào.
+                                    <a asp-controller="Posts" asp-action="Create" class="alert-link">Tạo bài viết mới ngay!</a>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="row"> @* Use row/col for layout *@
+                                    @foreach (var item in Model.Posts.OrderByDescending(p => p.CreatedAt)) @* Order by newest first *@
+                                    {
+                                        <div class="col-md-6 mb-4">
+                                            <div class="card h-100 card-post-preview"> @* Added custom class for potential specific styling *@
+                                                <div class="card-header d-flex justify-content-between align-items-center">
+                                                    <span class="fw-bold">@item.Title</span>
+                                                    <span class="badge @(item.Status == PostStatus.Approved ? "bg-success" :
+                                                                                        item.Status == PostStatus.Pending ? "bg-warning text-dark" : "bg-danger")">
+                                                        @(item.Status == PostStatus.Approved ? "Đã duyệt" :
+                                                                            item.Status == PostStatus.Pending ? "Chờ duyệt" : "Từ chối")
+                                                    </span>
+                                                </div>
+                                                <div class="row g-0"> @* Use row g-0 inside card for image/text alignment *@
+                                                    <div class="col-md-4">
+                                                        <img src="@(item.ImageUrl ?? "/images/placeholder-post.png")" @* Fallback image *@
+                                                            alt="@item.Title"
+                                                            class="img-fluid rounded-start post-card-img w-100" /> @* Use rounded-start, w-100 *@
+                                                    </div>
+                                                    <div class="col-md-8">
+                                                        <div class="card-body">
+                                                            <p class="card-text small mb-1">
+                                                                <strong>Địa điểm:</strong> @(item.Spot?.Name ?? "N/A")<br /> @* Null check for Spot *@
+                                                                <strong>Loại:</strong> @item.TypeOfPost<br />
+                                                                <strong>Ngày tạo:</strong> @item.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                            </p>
+                                                            <p class="card-text small">
+                                                                @if (!string.IsNullOrEmpty(item.Content))
+                                                                {
+                                                                    @(item.Content.Length > 80 ? item.Content.Substring(0, 80) + "..." : item.Content) @* Shorter preview *@
+                                                                }
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="card-footer text-center">
+                                                    @* Update asp-controller if your posts controller is named differently *@
+                                                    <a asp-controller="Posts" asp-action="Details" asp-route-id="@item.PostId" class="btn btn-sm btn-outline-info">Chi tiết</a>
+                                                    <a asp-controller="Posts" asp-action="Edit" asp-route-id="@item.PostId" class="btn btn-sm btn-outline-primary">Sửa</a>
+                                                    <a asp-controller="Posts" asp-action="Delete" asp-route-id="@item.PostId" class="btn btn-sm btn-outline-danger">Xóa</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+            <div class="content-section" id="danh-gia">
+                <h3 class="section-title">Đánh giá của tôi</h3>
+                <div class="blog-list">
+                @if (Model?.Reviews != null && Model.Reviews.Any())
+                     {
+                        @foreach (var review in Model.Reviews)
+                     {
+                               @* <div class="blog-item"> *@
+                               <div class="blog-item" style="cursor: pointer;" onclick="location.href='@Url.Action("Details", "TouristSpots", new { id = review.Spot.SpotId })'">
+
+                            
+                            <img src="@(Url.Content(review.ImageUrl))" 
+                         alt="@review?.Spot?.Name" style="width: 100px; height: 100px;">
+                            <div class="blog-content">
+                            <div class="blog-title">@review?.Rating</div>
+                            <div class="blog-preview">@review?.Comment?.Substring(0, Math.Min(review.Comment.Length, 100))...</div>
+                            <div class="blog-meta">
+                            <span>Đăng ngày: @review?.CreatedAt.ToString("dd/MM/yyyy")</span>
+                               </div>
+                                 </div>
+                                     </div>
+                       }
+                    }
+                else
+                  {
+                          <div class="alert alert-info text-center">Bạn chưa viết đánh giá nào.</div>
+                    }
+                </div>
+            </div>
+
+
+
+            @* Phần bình luận của tôi *@
+                 <div class="content-section" id="binh-luan">
+    <h3 class="section-title">
+        <i class="bi bi-chat-dots-fill me-2"></i>
+        Bình luận của tôi (@Model.PostComments.Count)
+    </h3>
+    <div class="blog-list">
+        @if (Model.PostComments != null && Model.PostComments.Any())
+        {
+            foreach (var comment in Model.PostComments.OrderByDescending(c => c.CreatedAt))
+            {
+                <div class="blog-item">
+                    <div class="blog-content">
+                        <div class="blog-title">
+                            @Html.Raw(comment.Content)
+                        </div>
+                        <div class="blog-meta">
+                            <span><i class="bi bi-clock me-1"></i>@comment.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+
+                            @if (comment.Post != null)
+                            {
+                                <span class="ms-3">
+                                    <i class="bi bi-file-text me-1"></i>Trong bài viết:
+                                    <a href="@Url.Action("Details", "Posts", new { id = comment.PostId })" title="@comment.Post.Title">
+                                        @(comment.Post.Title != null && comment.Post.Title.Length > 50
+                                            ? comment.Post.Title.Substring(0, 50) + "..."
+                                            : comment.Post.Title ?? "Không có tiêu đề")
+                                    </a>
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="ms-3 text-warning">
+                                    <i class="bi bi-exclamation-triangle me-1"></i>Bài viết liên quan không còn tồn tại
+                                </span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="alert alert-info text-center">Bạn chưa có bình luận nào.</div>
+        }
+    </div>
+</div>
+                    
+
+
+            <div class="content-section" id="dia-diem-yeu-thich">
+                <h3 class="section-title">Địa điểm yêu thích</h3>
+                <div class="travel-inspiration">
+                    @foreach (var favorite in Model.SpotFavorites.Take(3))
+                    {
+                        @* <div class="inspiration-card">
+                            <img src="@favorite.Spot.ImageUrl" alt="@favorite.Spot.Name">
+                            <div class="inspiration-content">
+                                <div class="inspiration-title">@favorite.Spot.Name</div>
+                                
+                                <div class="inspiration-meta">
+                                    <span>Đã lưu</span>
+                                </div>
+                            </div>
+                        </div> *@
+                        <a asp-controller="TouristSpots" asp-action="Details" asp-route-id="@favorite.Spot.SpotId" class="inspiration-card">
+                <img src="@favorite.Spot.ImageUrl" alt="@favorite.Spot.Name">
+                <div class="inspiration-content">
+                    <div class="inspiration-title">@favorite.Spot.Name</div>
+                    
+                    <div class="inspiration-meta">
+                        <span>Đã lưu</span>
+                    </div>
+                </div>
+            </a>
+                    }
+                    @if (Model.SpotFavorites.Count == 0)
+                    {
+                        @* <div class="alert alert-info text-center">Bạn chưa có địa điểm yêu thích.</div> *@
+                        <div class="empty-state-favorites text-center p-4">
+                            <div class="empty-icon mb-3" style="font-size: 3rem; color: #6c757d;">🗺️</div> @* Hoặc 🧳 *@
+                            <h4>Bộ sưu tập yêu thích của bạn đang chờ!</h4>
+                            <p class="text-muted">
+                                Tìm thấy một nơi bạn muốn đến? Chỉ cần nhấn ❤️ để lưu lại đây và dễ dàng tìm thấy sau này.
+                            </p>
+                            <a asp-controller="TouristSpots" asp-action="Index" class="btn btn-outline-primary mt-3" style="border-radius: 20px; padding: 10px 25px;">
+                                Bắt đầu khám phá
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="content-section" id="bai-viet-yeu-thich">
+                <h3 class="section-title">Bài viết yêu thích</h3>
+                <div class="favorite-posts">
+                    @foreach (var favorite in Model.PostFavorites.Take(4))
+                    {
+                        @* <div class="favorite-post-card">
+                            <img src="@favorite.Post.ImageUrl" alt="@favorite.Post.Title">
+                            <div class="favorite-post-content">
+                                <div class="favorite-post-title">@favorite.Post.Title</div>
+                                <div class="favorite-post-author">
+                                    <img src="@favorite.Post.User.AvatarUrl" alt="@favorite.Post.User.FullName">
+                                    <div class="favorite-post-author-name">@favorite.Post.User.FullName • @favorite.Post.CreatedAt.ToString("dd/MM/yyyy")</div>
+                                </div>
+                            </div>
+                        </div> *@
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@favorite.Post.PostId" class="favorite-post-card">
+                <img src="@favorite.Post.ImageUrl" alt="@favorite.Post.Title">
+                <div class="favorite-post-content">
+                    <div class="favorite-post-title">@favorite.Post.Title</div>
+                    <div class="favorite-post-author">
+                        <img src="@favorite.Post.User.AvatarUrl" alt="@favorite.Post.User.FullName">
+                        <div class="favorite-post-author-name">@favorite.Post.User.FullName • @favorite.Post.CreatedAt.ToString("dd/MM/yyyy")</div>
+                    </div>
+                </div>
+            </a>
+                    }
+                    @if (Model.PostFavorites.Count == 0)
+                    {
+                        <div class="alert alert-info text-center">Bạn chưa có bài viết yêu thích.</div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<!-- Lightbox for images -->
+<div id="lightbox" class="lightbox">
+    <span class="close-lightbox">&times;</span>
+    <img class="lightbox-content" id="lightbox-img">
+    <div class="lightbox-caption"></div>
+</div>
+
+@section Scripts {
+<script>
+    // JavaScript để xử lý cuộn trang và hiệu ứng mượt mà
+    document.addEventListener('DOMContentLoaded', function () {
+        // Thêm hiệu ứng cuộn mượt mà cho các liên kết trong menu
+        const menuItems = document.querySelectorAll('.profile-menu a');
+        menuItems.forEach(item => {
+            item.addEventListener('click', function (e) {
+                // Ngừng hành động mặc định để ngăn trang tự động cuộn
+                e.preventDefault();
+
+                // Lấy mục tiêu cuộn và cuộn đến đó
+                const targetId = this.getAttribute('href').substring(1); // Loại bỏ dấu # từ href
+                const targetElement = document.getElementById(targetId);
+                window.scrollTo({
+                    top: targetElement.offsetTop - 50, // Để cho phần trên của mục cuộn cách một chút
+                    behavior: 'smooth'
+                });
+
+                // Thêm hiệu ứng active cho menu
+                menuItems.forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // Thêm hiệu ứng active cho các tab
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Xóa lớp 'active' khỏi tất cả các tab và tab content
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                // Thêm lớp 'active' vào tab đã nhấn và phần nội dung tương ứng
+                tab.classList.add('active');
+                const activeTab = tab.getAttribute('data-tab');
+                document.getElementById(`${activeTab}-tab`).classList.add('active');
+            });
+        });
+    });
+    function enablePhoneEdit() {
+        const input = document.getElementById('PhoneNumberInput');
+        input.classList.remove('d-none');
+        input.focus();
+    }
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            
+            reader.onload = function(e) {
+                document.getElementById('avatarPreview').src = e.target.result;
+            }
+            
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+            // Open lightbox when clicking on image
+        function openLightbox(src) {
+                var lightbox = document.getElementById('lightbox');
+    var lightboxImg = document.getElementById('lightbox-img');
+            document.getElementById('lightbox').style.display = 'flex';
+            document.getElementById('lightbox-img').src = src;
+        }
+        document.addEventListener('click', function(e) {
+    var lightbox = document.getElementById('lightbox');
+    if (e.target.id === 'lightbox') {
+        lightbox.style.display = 'none';
+    }
+});
+// Handle drag and drop
+        const avatarContainer = document.querySelector('.avatar-container');
+        
+        avatarContainer.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.classList.add('drag-over');
+        });
+        
+        avatarContainer.addEventListener('dragleave', function() {
+            this.classList.remove('drag-over');
+        });
+        
+        avatarContainer.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.classList.remove('drag-over');
+            
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                document.getElementById('avatarFile').files = e.dataTransfer.files;
+                handleFileChange(document.getElementById('avatarFile'));
+            }
+        });
+        
+        // Handle file selection
+        function handleFileChange(input) {
+            if (input.files && input.files[0]) {
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('avatarPreview').src = e.target.result;
+                }
+                reader.readAsDataURL(input.files[0]);
+                
+                // Show uploading message
+                document.getElementById('uploadingMessage').classList.remove('d-none');
+                
+                // Submit the form automatically
+                setTimeout(() => {
+                    document.getElementById('avatarForm').submit();
+                }, 500);
+            }
+        }
+        
+        // Add tooltip
+        const cameraButton = document.querySelector('.avatar-container .position-absolute');
+        cameraButton.setAttribute('title', 'Nhấn để chọn ảnh hoặc kéo thả vào đây');
+        
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        });
+</script>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // ... (code xử lý cuộn trang và tab giữ nguyên) ...
+
+            // === CODE MỚI CHO EDIT BIO ===
+            const displayBioElement = document.getElementById('displayBio');
+            const editBioIcon = document.getElementById('editBioIcon');
+            const editBioForm = document.getElementById('editBioForm');
+            const bioTextarea = document.getElementById('bioEditTextarea');
+            const saveBioBtn = document.getElementById('saveBioBtn');
+            const cancelBioBtn = document.getElementById('cancelBioBtn');
+            const bioSavingMessage = document.getElementById('bioSavingMessage');
+            const bioErrorMessage = document.getElementById('bioErrorMessage');
+
+            // --- Hàm chuyển sang chế độ xem ---
+            function showDisplayMode() {
+                displayBioElement.style.display = 'block'; // Hoặc 'inline'/'flex' tùy thuộc vào CSS ban đầu
+                editBioForm.style.display = 'none';
+                bioErrorMessage.classList.add('d-none'); // Ẩn thông báo lỗi
+                bioSavingMessage.classList.add('d-none'); // Ẩn thông báo đang lưu
+            }
+
+            // --- Hàm chuyển sang chế độ sửa ---
+            function showEditMode() {
+                displayBioElement.style.display = 'none';
+                editBioForm.style.display = 'block';
+                bioTextarea.value = '@Html.Raw(Model.Bio?.Replace("'", "\\'").Replace("\r\n", "\\n").Replace("\n", "\\n") ?? "")'; // Lấy giá trị bio gốc, escape ký tự đặc biệt cho JS
+                bioTextarea.focus(); // Focus vào textarea
+            }
+
+            // --- Sự kiện click vào icon sửa ---
+            if (editBioIcon) {
+                editBioIcon.addEventListener('click', showEditMode);
+            }
+
+            // --- Sự kiện click nút Hủy ---
+            if (cancelBioBtn) {
+                cancelBioBtn.addEventListener('click', showDisplayMode);
+            }
+
+            // --- Sự kiện click nút Lưu ---
+            if (saveBioBtn) {
+                saveBioBtn.addEventListener('click', function () {
+                    const newBio = bioTextarea.value.trim();
+                    const tokenInput = editBioForm.querySelector('input[name="__RequestVerificationToken"]'); // Lấy token từ form ẩn
+                    const token = tokenInput ? tokenInput.value : '';
+
+                    if (!token) {
+                         console.error('CSRF token not found!');
+                         bioErrorMessage.textContent = 'Lỗi bảo mật. Vui lòng tải lại trang.';
+                         bioErrorMessage.classList.remove('d-none');
+                         return;
+                    }
+
+                    bioSavingMessage.classList.remove('d-none'); // Hiển thị đang lưu
+                    bioErrorMessage.classList.add('d-none'); // Ẩn lỗi cũ
+                    saveBioBtn.disabled = true; // Vô hiệu hóa nút lưu tạm thời
+                    cancelBioBtn.disabled = true;
+
+                    // Gọi API để cập nhật bio
+                    fetch('/Profile/UpdateBio', { // <<<=== THAY ĐỔI URL API NẾU CẦN
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'RequestVerificationToken': token
+                        },
+                        body: JSON.stringify({ bio: newBio }) // Gửi dữ liệu dạng JSON
+                    })
+                    .then(response => {
+                         if (!response.ok) {
+                            // Xử lý lỗi HTTP (ví dụ: 400, 401, 500)
+                            return response.json().then(err => { throw err; }); // Ném lỗi để catch xử lý
+                         }
+                         return response.json(); // Parse JSON nếu thành công
+                    })
+                    .then(data => {
+                        if (data && data.success) {
+                            // Cập nhật lại nội dung hiển thị
+                            const displayContent = newBio ? newBio.replace(/\n/g, '<br />') : '<span class="fst-italic">Chưa có tiểu sử.</span>';
+                            // Tách icon ra khỏi nội dung để dễ cập nhật
+                            displayBioElement.innerHTML = displayContent + ' <i class="bi bi-pencil-square ms-2 text-primary cursor-pointer" id="editBioIcon" title="Chỉnh sửa tiểu sử"></i>';
+                            // Gắn lại sự kiện cho icon mới tạo
+                             const newEditIcon = document.getElementById('editBioIcon');
+                             if(newEditIcon) { newEditIcon.addEventListener('click', showEditMode); }
+
+                            showDisplayMode(); // Chuyển về chế độ hiển thị
+                            // Có thể thêm thông báo thành công ngắn gọn (ví dụ: Toastr)
+                            // alert('Cập nhật tiểu sử thành công!');
+                        } else {
+                            // Hiển thị lỗi từ server
+                            throw new Error(data?.message || 'Lưu thất bại.');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Lỗi khi cập nhật bio:', error);
+                        const errorMessageText = error?.message || 'Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.';
+                        bioErrorMessage.textContent = errorMessageText;
+                        bioErrorMessage.classList.remove('d-none');
+                    })
+                    .finally(() => {
+                        // Luôn luôn bật lại các nút và ẩn thông báo loading
+                        bioSavingMessage.classList.add('d-none');
+                        saveBioBtn.disabled = false;
+                        cancelBioBtn.disabled = false;
+                    });
+                });
+            }
+        });
+    </script>
+<style>
+    .profile-sidebar {
+    max-height: 100vh;
+    overflow-y: auto;
+    position: sticky;
+    top: 0;
+    scrollbar-width: thin; /* Dành cho Firefox */
+    scrollbar-color: transparent transparent; /* Dành cho Firefox */
+    }
+
+    .profile-sidebar::-webkit-scrollbar {
+    width: 5px; /* Giảm độ rộng thanh cuộn */
+    }
+
+    .profile-sidebar::-webkit-scrollbar-thumb {
+    background-color: transparent; /* Trong suốt hoàn toàn */
+    }
+
+    .profile-sidebar::-webkit-scrollbar-track {
+    background-color: transparent; /* Trong suốt hoàn toàn */
+    }
+
+    .profile-sidebar:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.1); /* Xuất hiện mờ nhẹ khi hover */
+    }
+    .avatar-container:hover .avatar-overlay {
+        opacity: 1;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .avatar-container.drag-over:after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    
+    .hover-bg:hover {
+        background-color: #f0f0f0 !important;
+        transition: background-color 0.2s ease;
+    }
+    
+    .cursor-pointer {
+        cursor: pointer;
+    }
+    
+    .object-fit-cover {
+        object-fit: cover;
+    }
+    .square-image {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    }
+    #lightbox {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.8);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#lightbox img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 4px;
+}
+</style>
+}

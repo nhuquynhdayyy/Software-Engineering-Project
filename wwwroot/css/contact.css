@@ -1,0 +1,343 @@
+/* Contact Page Specific Styles - Won't affect header */
+.contact-section {
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: linear-gradient(135deg, #5eb7ff, #5eb7ff);
+  min-height: 100vh;
+  position: relative;
+  overflow: hidden;
+  padding: 4rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto;
+}
+
+/* Animated background particles - more subtle */
+.contact-section .bg-particles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.contact-section .particle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 50%;
+  animation: float 8s ease-in-out infinite;
+}
+
+.contact-section .particle:nth-child(1) {
+  width: 60px;
+  height: 60px;
+  top: 15%;
+  left: 8%;
+  animation-delay: 0s;
+}
+.contact-section .particle:nth-child(2) {
+  width: 40px;
+  height: 40px;
+  top: 65%;
+  left: 85%;
+  animation-delay: 2s;
+}
+.contact-section .particle:nth-child(3) {
+  width: 30px;
+  height: 30px;
+  top: 85%;
+  left: 25%;
+  animation-delay: 4s;
+}
+.contact-section .particle:nth-child(4) {
+  width: 80px;
+  height: 80px;
+  top: 25%;
+  left: 75%;
+  animation-delay: 1s;
+}
+.contact-section .particle:nth-child(5) {
+  width: 35px;
+  height: 35px;
+  top: 75%;
+  left: 55%;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateY(-15px) rotate(180deg);
+    opacity: 0.7;
+  }
+}
+
+/* Login Prompt Styling - cleaner design */
+.contact-section .login-prompt {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 3rem 2.5rem;
+  text-align: center;
+  margin-bottom: 4rem;
+  box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transform: translateY(0);
+  transition: all 0.3s ease;
+  max-width: 500px;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-section .login-prompt:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+}
+
+.contact-section .login-prompt h3 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.contact-section .login-prompt p {
+  font-size: 1rem;
+  color: #6b7280;
+  margin-bottom: 2rem;
+  line-height: 1.5;
+}
+
+.contact-section .login-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.contact-section .btn {
+  padding: 0.875rem 2rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border: none;
+  cursor: pointer;
+  min-width: 120px;
+  display: inline-block;
+  text-align: center;
+}
+
+.contact-section .btn-primary {
+  background: #667eea;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.contact-section .btn-primary:hover {
+  background: #5a67d8;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+  color: white;
+  text-decoration: none;
+}
+
+.contact-section .btn-secondary {
+  background: transparent;
+  color: #667eea;
+  border: 1.5px solid #667eea;
+}
+
+.contact-section .btn-secondary:hover {
+  background: #667eea;
+  color: white;
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* Section Title */
+.contact-section .section-title {
+  font-size: 2.2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 1rem;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-section .section-subtitle {
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 3rem;
+  color: rgba(255, 255, 255, 0.85);
+  max-width: 500px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Info Cards Grid - cleaner design */
+.contact-section .info-cards {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 1000px;
+  position: relative;
+  z-index: 1;
+}
+
+.contact-section .info-card {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem 1.5rem;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-section .info-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 35px rgba(102, 126, 234, 0.15);
+  background: rgba(255, 255, 255, 1);
+}
+
+.contact-section .info-card .icon {
+  font-size: 2.5rem;
+  margin-bottom: 1.2rem;
+  display: block;
+  transition: all 0.3s ease;
+}
+
+.contact-section .info-card:hover .icon {
+  transform: scale(1.05);
+}
+
+.contact-section .info-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 0.8rem;
+  transition: color 0.3s ease;
+}
+
+.contact-section .info-card:hover h3 {
+  color: #667eea;
+}
+
+.contact-section .info-card p {
+  font-size: 0.9rem;
+  color: #6b7280;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.contact-section .info-card:hover p {
+  color: #4b5563;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .contact-section .info-cards {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 768px) {
+  .contact-section {
+    padding: 2rem 1rem;
+  }
+
+  .contact-section .login-prompt {
+    padding: 2.5rem 2rem;
+    margin-bottom: 3rem;
+  }
+
+  .contact-section .login-prompt h3 {
+    font-size: 1.6rem;
+  }
+
+  .contact-section .section-title {
+    font-size: 1.8rem;
+  }
+
+  .contact-section .section-subtitle {
+    font-size: 1rem;
+    margin-bottom: 2.5rem;
+  }
+
+  .contact-section .info-cards {
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+
+  .contact-section .login-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .contact-section .btn {
+    width: 100%;
+    max-width: 180px;
+  }
+}
+
+@media (max-width: 480px) {
+  .contact-section .login-prompt {
+    padding: 2rem 1.5rem;
+  }
+
+  .contact-section .info-card {
+    padding: 1.8rem 1.2rem;
+  }
+
+  .contact-section .section-title {
+    font-size: 1.6rem;
+  }
+}
+
+/* Loading animation - more subtle */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.contact-section .login-prompt,
+.contact-section .info-card {
+  animation: fadeInUp 0.5s ease forwards;
+}
+
+.contact-section .info-card:nth-child(1) {
+  animation-delay: 0.1s;
+}
+.contact-section .info-card:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.contact-section .info-card:nth-child(3) {
+  animation-delay: 0.2s;
+}
+.contact-section .info-card:nth-child(4) {
+  animation-delay: 0.25s;
+}

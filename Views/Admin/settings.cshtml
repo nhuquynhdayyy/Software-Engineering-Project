@@ -1,0 +1,341 @@
+@{
+    ViewData["Title"] = "Cài Đặt - Hệ Thống Quản Trị";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+    string siteName = ViewData["SiteName"] as string ?? "";
+    string siteDescription = ViewData["SiteDescription"] as string ?? "";
+    string siteUrlReadOnly = ViewData["SiteUrl_ReadOnly"] as string ?? "https://chua-cau-hinh.com"; // Lấy URL chỉ đọc
+    string adminPanelLanguage = ViewData["AdminPanelLanguage"] as string ?? "vi";
+    string timezone = ViewData["Timezone"] as string ?? "Asia/Ho_Chi_Minh";
+    string dateFormat = ViewData["DateFormat"] as string ?? "dd/MM/yyyy";
+    int postsPerPage = Convert.ToInt32(ViewData["PostsPerPage"] ?? 10);
+    int commentsPerPage = Convert.ToInt32(ViewData["CommentsPerPage"] ?? 10);
+    int? defaultCategoryId = ViewData["DefaultCategoryId"] as int?;
+    bool autoApproveCommentsRegisteredUsers = Convert.ToBoolean(ViewData["AutoApproveCommentsRegisteredUsers"] ?? true);
+    string adminTheme = ViewData["AdminTheme"] as string ?? "system";
+    string adminPrimaryColor = ViewData["AdminPrimaryColor"] as string ?? "#3B82F6";
+    string adminFontFamily = ViewData["AdminFontFamily"] as string ?? "Roboto, sans-serif";
+    bool notifyInAppNewComment = Convert.ToBoolean(ViewData["NotifyInAppNewComment"] ?? true);
+    bool notifyEmailNewUser = Convert.ToBoolean(ViewData["NotifyEmailNewUser"] ?? false);
+    bool requireCommentApprovalGlobal = Convert.ToBoolean(ViewData["RequireCommentApprovalGlobal"] ?? true);
+    bool requireEmailVerification = Convert.ToBoolean(ViewData["RequireEmailVerification"] ?? true);
+    string systemVersion = ViewData["SystemVersion"] as string ?? "1.0.0";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/cssadmin/settings.css">
+    <link rel="stylesheet" href="~/cssadmin/dark-mode.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+<div class="app-container">
+    <div class="main-content">
+        <main class="content-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Cài Đặt</h1>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+            }
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+            }
+
+            <form asp-controller="Admin" asp-action="SaveSettings" method="post">
+                @Html.AntiForgeryToken()
+                <div class="settings-container">
+                    <div class="settings-sidebar">
+                         <div class="settings-nav">
+                            <button type="button" class="settings-nav-item active" data-tab="general">
+                                <i class="fas fa-sliders-h"></i>
+                                <span>Cài đặt chung</span>
+                            </button>
+                            @* <button type="button" class="settings-nav-item" data-tab="appearance">
+                                <i class="fas fa-palette"></i>
+                                <span>Giao diện</span>
+                            </button> *@
+                            <button type="button" class="settings-nav-item" data-tab="notifications">
+                                <i class="fas fa-bell"></i>
+                                <span>Thông báo</span>
+                            </button>
+                            <button type="button" class="settings-nav-item" data-tab="privacy">
+                                <i class="fas fa-shield-alt"></i>
+                                <span>Quyền riêng tư</span>
+                            </button>
+                            <button type="button" class="settings-nav-item" data-tab="about">
+                                <i class="fas fa-info-circle"></i>
+                                <span>Thông tin hệ thống</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="settings-content">
+                        <!-- General Settings Tab -->
+                        <div class="settings-tab active" id="general">
+                            <h2 class="settings-title">Cài đặt chung</h2>
+                            <div class="settings-section">
+                                <h3 class="section-title">Thông tin trang web</h3>
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label for="SiteName">Tên trang web</label>
+                                        <input type="text" id="SiteName" name="SiteName" value="@siteName" class="form-control">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="SiteDescription">Mô tả</label>
+                                        <textarea id="SiteDescription" name="SiteDescription" rows="3" class="form-control">@siteDescription</textarea>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>URL trang web (Cấu hình hệ thống)</label>
+                                        <p class="form-control-static"><strong>@siteUrlReadOnly</strong></p>
+                                        @* Hoặc: <input type="text" value="@siteUrlReadOnly" class="form-control" readonly> *@
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="settings-section">
+                                <h3 class="section-title">Ngôn ngữ & Khu vực</h3>
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label for="AdminPanelLanguage">Ngôn ngữ</label>
+                                        <select id="AdminPanelLanguage" name="AdminPanelLanguage" class="form-control">
+                                            <option value="vi" selected="@(adminPanelLanguage == "vi")">Tiếng Việt</option>
+                                            <option value="en" selected="@(adminPanelLanguage == "en")">English</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="Timezone">Múi giờ</label>
+                                        <select id="Timezone" name="Timezone" class="form-control">
+                                            <option value="Asia/Ho_Chi_Minh" selected="@(timezone == "Asia/Ho_Chi_Minh")">(GMT+7:00) Hà Nội, Bangkok, Jakarta</option>
+                                            <option value="Asia/Tokyo" selected="@(timezone == "Asia/Tokyo")">(GMT+9:00) Tokyo, Seoul</option>
+                                        </select>
+                                    </div>
+                                     <div class="form-group">
+                                        <label for="DateFormat">Định dạng ngày</label>
+                                        <select id="DateFormat" name="DateFormat" class="form-control">
+                                            <option value="dd/MM/yyyy" selected="@(dateFormat == "dd/MM/yyyy")">DD/MM/YYYY</option>
+                                            <option value="MM/dd/yyyy" selected="@(dateFormat == "MM/dd/yyyy")">MM/DD/YYYY</option>
+                                            <option value="yyyy-MM-dd" selected="@(dateFormat == "yyyy-MM-dd")">YYYY-MM-DD</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                             <div class="settings-section">
+                                <h3 class="section-title">Cài đặt nội dung</h3>
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label for="PostsPerPage">Số bài viết trên mỗi trang</label>
+                                        <input type="number" id="PostsPerPage" name="PostsPerPage" value="@postsPerPage" class="form-control" min="5" max="50">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="CommentsPerPage">Số bình luận trên mỗi trang</label>
+                                        <input type="number" id="CommentsPerPage" name="CommentsPerPage" value="@commentsPerPage" class="form-control" min="5" max="50">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="DefaultCategoryId">Danh mục mặc định (ID)</label>
+                                        <input type="number" id="DefaultCategoryId" name="DefaultCategoryId" value="@(defaultCategoryId.HasValue ? defaultCategoryId.Value.ToString() : "")" placeholder="Nhập Category ID" class="form-control">
+                                    </div>
+                                    <div class="form-group checkbox-group">
+                                        <input type="checkbox" id="AutoApproveCommentsRegisteredUsers" name="AutoApproveCommentsRegisteredUsers" value="true" checked="@autoApproveCommentsRegisteredUsers">
+                                        <label for="AutoApproveCommentsRegisteredUsers">Tự động duyệt bình luận từ người dùng đã đăng ký</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Appearance Settings Tab (Giữ nguyên như trước) -->
+                        @* <div class="settings-tab" id="appearance">
+                             <h2 class="settings-title">Giao diện</h2>
+                             <div class="settings-section">
+                                <h3 class="section-title">Chủ đề</h3>
+                                 <div class="form-group">
+                                    <label for="AdminTheme">Chủ đề</label>
+                                    <select id="AdminTheme" name="AdminTheme" class="form-control">
+                                        <option value="light" selected="@(adminTheme == "light")">Sáng</option>
+                                        <option value="dark" selected="@(adminTheme == "dark")">Tối</option>
+                                        <option value="system" selected="@(adminTheme == "system")">Theo hệ thống</option>
+                                    </select>
+                                </div>
+                            </div>
+                             <div class="settings-section">
+                                <h3 class="section-title">Màu sắc</h3>
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label for="AdminPrimaryColor">Màu chính</label>
+                                        <div class="color-picker">
+                                            <input type="color" id="AdminPrimaryColorColor" value="@adminPrimaryColor" onchange="$('#AdminPrimaryColor').val(this.value)">
+                                            <input type="text" id="AdminPrimaryColor" name="AdminPrimaryColor" value="@adminPrimaryColor" onchange="$('#AdminPrimaryColorColor').val(this.value)">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="settings-section">
+                                <h3 class="section-title">Phông chữ</h3>
+                                <div class="settings-form">
+                                    <div class="form-group">
+                                        <label for="AdminFontFamily">Phông chữ</label>
+                                        <select id="AdminFontFamily" name="AdminFontFamily" class="form-control">
+                                            <option value="system-ui" selected="@(adminFontFamily == "system-ui")">Mặc định hệ thống</option>
+                                            <option value="Roboto, sans-serif" selected="@(adminFontFamily == "Roboto, sans-serif")">Roboto</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div> *@
+
+                        <!-- Notifications Settings Tab (Giữ nguyên như trước) -->
+                        <div class="settings-tab" id="notifications">
+                            <h2 class="settings-title">Thông báo</h2>
+                             <div class="settings-section">
+                                <h3 class="section-title">Thông báo</h3>
+                                <div class="settings-form">
+                                    <div class="form-group toggle-group">
+                                        <div class="toggle-header">
+                                            <div>
+                                                <label for="NotifyInAppNewComment">Bình luận mới (In-app)</label>
+                                            </div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="NotifyInAppNewComment" name="NotifyInAppNewComment" value="true" checked="@notifyInAppNewComment">
+                                                <label for="NotifyInAppNewComment"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                     <div class="form-group toggle-group">
+                                        <div class="toggle-header">
+                                            <div>
+                                                <label for="NotifyEmailNewUser">Người dùng mới (Email)</label>
+                                            </div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="NotifyEmailNewUser" name="NotifyEmailNewUser" value="true" checked="@notifyEmailNewUser">
+                                                <label for="NotifyEmailNewUser"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Privacy Settings Tab -->
+                        <div class="settings-tab" id="privacy">
+                             <h2 class="settings-title">Quyền riêng tư</h2>
+                             <div class="settings-section">
+                                <h3 class="section-title">Cài đặt</h3>
+                                <div class="settings-form">
+                                    <div class="form-group toggle-group">
+                                        <div class="toggle-header">
+                                            <div>
+                                                <label for="RequireCommentApprovalGlobal">Yêu cầu phê duyệt bình luận</label>
+                                            </div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="RequireCommentApprovalGlobal" name="RequireCommentApprovalGlobal" value="true" checked="@requireCommentApprovalGlobal">
+                                                <label for="RequireCommentApprovalGlobal"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                     <div class="form-group toggle-group">
+                                        <div class="toggle-header">
+                                            <div>
+                                                <label for="RequireEmailVerification">Yêu cầu xác minh email khi đăng ký</label>
+                                            </div>
+                                            <div class="toggle-switch">
+                                                <input type="checkbox" id="RequireEmailVerification" name="RequireEmailVerification" value="true" checked="@requireEmailVerification">
+                                                <label for="RequireEmailVerification"></label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="settings-section">
+                                <h3 class="section-title">Chính sách & Điều khoản</h3>
+                                 <div class="policy-content" style="white-space: pre-line; overflow-y: auto; max-height: 300px;">
+                                <h4>Chính sách Bảo mật</h4>
+        <p>
+            Chúng tôi cam kết bảo vệ thông tin cá nhân của bạn. Dữ liệu cá nhân sẽ được thu thập, sử dụng và bảo vệ 
+            theo đúng quy định pháp luật hiện hành. Thông tin mà chúng tôi thu thập bao gồm: tên, địa chỉ email, số điện thoại, 
+            địa chỉ IP, và các thông tin cần thiết khác nhằm cung cấp dịch vụ tốt nhất cho bạn.
+            
+            Việc thu thập dữ liệu được thực hiện minh bạch và có sự đồng ý từ phía người dùng. Chúng tôi không chia sẻ 
+            thông tin cá nhân của bạn với bên thứ ba nếu không có sự đồng ý rõ ràng từ bạn, trừ khi được pháp luật yêu cầu. 
+            Các biện pháp bảo mật như mã hóa dữ liệu, xác thực hai yếu tố, và tường lửa được áp dụng để bảo vệ dữ liệu của bạn.
+
+            Người dùng có quyền yêu cầu truy cập, chỉnh sửa hoặc xóa dữ liệu cá nhân của mình bất kỳ lúc nào. 
+            Nếu có bất kỳ thắc mắc hoặc khiếu nại nào liên quan đến việc xử lý dữ liệu, vui lòng liên hệ với chúng tôi qua email hỗ trợ.
+        </p>
+
+        <h4>Điều khoản Dịch vụ</h4>
+        <p>
+            Việc sử dụng dịch vụ của chúng tôi đồng nghĩa với việc bạn chấp nhận tuân thủ các quy định và điều kiện dưới đây:
+            
+            1. Quyền sử dụng: Bạn được phép sử dụng dịch vụ cho các mục đích cá nhân, phi thương mại. 
+               Mọi hành vi sử dụng sai mục đích hoặc vi phạm pháp luật đều bị nghiêm cấm.
+               
+            2. Nội dung người dùng: Bạn hoàn toàn chịu trách nhiệm về nội dung mình đăng tải, bao gồm văn bản, hình ảnh, video và 
+               các tài liệu khác. Không đăng tải nội dung vi phạm bản quyền, xúc phạm, hoặc vi phạm pháp luật.
+               
+            3. Bảo mật tài khoản: Bạn phải tự bảo mật thông tin đăng nhập và không chia sẻ với người khác. 
+               Trong trường hợp tài khoản bị xâm nhập trái phép, hãy thông báo cho chúng tôi ngay lập tức.
+               
+            4. Chấm dứt dịch vụ: Chúng tôi có quyền chấm dứt hoặc đình chỉ tài khoản của bạn nếu phát hiện vi phạm chính sách 
+               hoặc sử dụng dịch vụ vào mục đích xấu.
+               
+            5. Giới hạn trách nhiệm: Chúng tôi không chịu trách nhiệm về bất kỳ thiệt hại trực tiếp hoặc gián tiếp nào 
+               phát sinh từ việc sử dụng dịch vụ, kể cả khi chúng tôi đã được thông báo về khả năng xảy ra thiệt hại đó.
+        </p>
+                                <p class="form-description">
+                                    Nội dung này được quản lý bởi quản trị viên hệ thống và không thể sửa đổi tại đây.
+                                </p>
+                                 @* XÓA CÁC Ô INPUT ID CHO CHÍNH SÁCH VÀ ĐIỀU KHOẢN *@
+                            </div>
+                            </div>
+                        </div>
+
+                        <!-- About System Tab (Giữ nguyên phần hiển thị SystemVersion và thông tin server) -->
+                        <div class="settings-tab" id="about">
+                             <h2 class="settings-title">Thông tin hệ thống</h2>
+                             <div class="settings-section">
+                                <h3 class="section-title">Phiên bản</h3>
+                                <div class="settings-form">
+                                     <div class="form-group">
+                                        <label for="SystemVersion">Phiên bản hệ thống</label>
+                                        <input type="text" id="SystemVersion" name="SystemVersion" value="@systemVersion" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="system-info">
+                                    <div class="info-item">
+                                        <div class="info-label">.NET Version</div>
+                                        <div class="info-value">@Environment.Version</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/jsadmin/settings.js"></script>
+    <script>
+        // JS cho color picker (ví dụ đơn giản)
+        document.querySelectorAll('.color-picker input[type="color"]').forEach(colorInput => {
+            colorInput.addEventListener('input', function() {
+                document.getElementById(this.id.replace('Color', '')).value = this.value;
+            });
+        });
+        document.querySelectorAll('.color-picker input[type="text"]').forEach(textInput => {
+            textInput.addEventListener('input', function() {
+                try {
+                    document.getElementById(this.id + 'Color').value = this.value;
+                } catch (e) { /* Bỏ qua lỗi nếu không hợp lệ */ }
+            });
+        });
+    </script>
+}

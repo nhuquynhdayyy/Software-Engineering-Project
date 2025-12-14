@@ -1,0 +1,446 @@
+/* Interactions Page Specific Styles */
+
+/* Stats Cards */
+.date-range-filter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.date-input {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+  width: 150px;
+}
+
+.filter-btn {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter-btn:hover {
+  background-color: #2980b9;
+}
+
+.filter-label {
+  font-weight: 500;
+  margin-right: 5px;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.reset-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reset-btn:hover {
+  background-color: #c0392b;
+}
+
+.expanded-filters {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.filter-toggle {
+  background: none;
+  border: none;
+  color: #3498db;
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  margin-left: auto;
+}
+
+.filter-toggle i {
+  margin-left: 5px;
+  transition: transform 0.3s;
+}
+
+.filter-toggle.active i {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 768px) {
+  .date-range-filter {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .date-input {
+    width: 100%;
+  }
+}
+/* Thêm vào file interactions.css */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.page-header-left {
+  display: flex;
+  align-items: center;
+}
+
+.page-actions {
+  display: flex;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.filter-group label {
+  margin: 0;
+  white-space: nowrap;
+  font-weight: normal;
+}
+
+.select-control {
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fff;
+  min-width: 120px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stats-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.stats-card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.stats-card-label {
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-bottom: 0.25rem;
+}
+
+.stats-card-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: var(--text-color);
+}
+
+.stats-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+}
+
+.stats-card-icon i {
+  font-size: 1.5rem;
+  color: white;
+}
+
+.stats-card-icon.blue {
+  background-color: #dbeafe;
+}
+
+.stats-card-icon.blue i {
+  color: var(--primary-color);
+}
+
+.stats-card-icon.red {
+  background-color: #fee2e2;
+}
+
+.stats-card-icon.red i {
+  color: #ef4444;
+}
+
+.stats-card-icon.amber {
+  background-color: #fef3c7;
+}
+
+.stats-card-icon.amber i {
+  color: #f59e0b;
+}
+
+.stats-card-icon.green {
+  background-color: #d1fae5;
+}
+
+.stats-card-icon.green i {
+  color: #10b981;
+}
+
+.stats-card-footer {
+  margin-top: 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.stats-trend {
+  font-weight: 500;
+}
+
+.stats-trend.positive {
+  color: var(--success-color);
+}
+
+.stats-trend.negative {
+  color: var(--danger-color);
+}
+
+/* Charts */
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.chart-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.chart-card.large {
+  grid-column: span 2;
+}
+
+.chart-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.chart-container {
+  height: 320px;
+  position: relative;
+}
+
+/* Table */
+.table-card {
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-title {
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.view-all {
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  text-decoration: none;
+}
+
+.view-all:hover {
+  text-decoration: underline;
+}
+
+.table-responsive {
+  overflow-x: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.data-table th {
+  padding: 0.75rem 1.5rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background-color: #f9fafb;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.data-table td {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  font-size: 0.875rem;
+}
+
+.data-table tr:hover {
+  background-color: #f9fafb;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.badge i {
+  margin-right: 0.25rem;
+  font-size: 0.75rem;
+}
+
+.badge.blue {
+  background-color: #eff6ff;
+  color: #2563eb;
+}
+
+.badge.green {
+  background-color: #ecfdf5;
+  color: #059669;
+}
+
+.badge.amber {
+  background-color: #fffbeb;
+  color: #d97706;
+}
+
+/* User Cell */
+.user-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.user-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.user-name {
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.user-email {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* Total Interactions */
+.total-interactions {
+  font-weight: 600;
+  color: var(--primary-color);
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chart-card.large {
+    grid-column: span 1;
+  }
+}
+
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+
+  .user-cell {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .user-avatar {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/*
+ * Tùy chỉnh style cho các liên kết trong bảng bài viết
+ */
+
+/* 
+ * 1. Đặt màu sắc nhất quán cho link dù đã truy cập hay chưa.
+ * 2. Bỏ gạch chân mặc định.
+ */
+.table-title-cell a,
+.table-title-cell a:link,
+.table-title-cell a:visited {
+  color: #333; /* <-- Chọn một màu bạn thích, ví dụ màu đen chữ */
+  text-decoration: none; /* <-- Bỏ gạch chân */
+  font-weight: 500; /* Có thể làm chữ đậm hơn một chút cho dễ nhìn */
+  transition: color 0.2s ease; /* Hiệu ứng chuyển màu mượt mà */
+}
+
+/* 
+ * 3. Thêm hiệu ứng khi di chuột vào để người dùng biết đây là link.
+ *    Đây là một thực hành tốt về UX (Trải nghiệm người dùng).
+ */
+.table-title-cell a:hover {
+  color: #007bff; /* <-- Đổi sang màu xanh khi di chuột vào */
+  text-decoration: underline; /* <-- Thêm lại gạch chân khi di chuột */
+}

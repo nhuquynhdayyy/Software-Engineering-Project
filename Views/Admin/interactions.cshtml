@@ -1,0 +1,519 @@
+@section Styles {
+    <link rel="stylesheet" href="~/cssadmin/interactions.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+@{
+    ViewData["Title"] = "Tương Tác - Hệ Thống Quản Trị";
+}
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Scripts {
+    <script src="~/js/jsadmin/interactions.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Hiển thị bộ lọc nâng cao nếu đang ở chế độ tùy chỉnh
+            const timeRangeSelect = document.getElementById('time-range');
+            const expandedFilters = document.getElementById('expanded-filters');
+            const toggleFiltersBtn = document.getElementById('toggle-filters');
+            
+            // Hiển thị bộ lọc nếu đang ở chế độ tùy chỉnh
+            if (timeRangeSelect.value === '0') {
+                expandedFilters.style.display = 'block';
+                if (toggleFiltersBtn) toggleFiltersBtn.classList.add('active');
+            }
+            
+            // Sự kiện khi click vào nút toggle bộ lọc
+            if (toggleFiltersBtn) {
+                toggleFiltersBtn.addEventListener('click', function() {
+                    if (expandedFilters.style.display === 'none' || expandedFilters.style.display === '') {
+                        expandedFilters.style.display = 'block';
+                        this.classList.add('active');
+                    } else {
+                        expandedFilters.style.display = 'none';
+                        this.classList.remove('active');
+                    }
+                });
+            }
+            
+            // Sự kiện khi click nút đặt lại
+            const resetButton = document.getElementById('reset-filter');
+            if (resetButton) {
+                resetButton.addEventListener('click', function(e) {
+                    e.preventDefault(); // Ngăn chặn hành vi mặc định
+                    
+                    // Đặt lại các trường input ngày nếu có
+                    if (document.getElementById('fromDate')) {
+                        document.getElementById('fromDate').value = '';
+                    }
+                    if (document.getElementById('toDate')) {
+                        document.getElementById('toDate').value = '';
+                    }
+                    
+                    // Đặt lại select box thời gian về giá trị mặc định (30 ngày)
+                    if (document.getElementById('time-range')) {
+                        document.getElementById('time-range').value = '30';
+                    }
+                    
+                    // Đặt lại timeRange ẩn
+                    if (document.getElementById('timeRange')) {
+                        document.getElementById('timeRange').value = '30';
+                    }
+                    
+                    // Chuyển hướng về trang Interactions mặc định với tham số timeRange=30
+                    // Sử dụng window.location.href trực tiếp để đảm bảo chuyển hướng
+                    window.location.href = window.location.pathname + '?timeRange=30';
+                });
+            }
+        });
+    
+    // Hàm áp dụng bộ lọc thời gian
+    function applyTimeRange(value) {
+        const expandedFilters = document.getElementById('expanded-filters');
+        const toggleFiltersBtn = document.getElementById('toggle-filters');
+        
+        if (value === '0') {
+            // Nếu chọn tùy chỉnh, hiển thị bộ lọc nâng cao
+            expandedFilters.style.display = 'block';
+            toggleFiltersBtn.classList.add('active');
+            document.getElementById('timeRange').value = value;
+        } else {
+            // Nếu chọn mốc thời gian có sẵn, chuyển hướng ngay
+            window.location.href = '@Url.Action("Interactions", "Admin")?timeRange=' + value;
+        }
+    }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Biểu đồ tương tác theo thời gian (dạng cột)
+            const interactionsCtx = document.getElementById('interactionsChart').getContext('2d');
+            const interactionsChart = new Chart(interactionsCtx, {
+                type: 'bar',
+                data: {
+                    labels: @Html.Raw(Json.Serialize(ViewBag.DateLabels)),
+                    datasets: [
+                        {
+                            label: 'Lượt thích bài viết',
+                            data: @Html.Raw(Json.Serialize(ViewBag.PostFavoritesData)),
+                            backgroundColor: 'rgba(231, 76, 60, 0.7)',
+                            borderColor: '#e74c3c',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Lượt chia sẻ bài viết',
+                            data: @Html.Raw(Json.Serialize(ViewBag.PostSharesData)),
+                            backgroundColor: 'rgba(46, 204, 113, 0.7)',
+                            borderColor: '#2ecc71',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Lượt thích địa điểm',
+                            data: @Html.Raw(Json.Serialize(ViewBag.SpotFavoritesData)),
+                            backgroundColor: 'rgba(52, 152, 219, 0.7)',
+                            borderColor: '#3498db',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Lượt chia sẻ địa điểm',
+                            data: @Html.Raw(Json.Serialize(ViewBag.SpotSharesData)),
+                            backgroundColor: 'rgba(243, 156, 18, 0.7)',
+                            borderColor: '#f39c12',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tương tác theo thời gian'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+
+            // Biểu đồ phân bố tương tác (doughnut chart)
+            const distributionCtx = document.getElementById('distributionChart').getContext('2d');
+            const distributionChart = new Chart(distributionCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Thích bài viết', 'Chia sẻ bài viết', 'Thích địa điểm', 'Chia sẻ địa điểm'],
+                    datasets: [{
+                        data: [
+                            @ViewBag.TotalPostFavorites,
+                            @ViewBag.TotalPostShares,
+                            @ViewBag.TotalSpotFavorites,
+                            @ViewBag.TotalSpotShares
+                        ],
+                        backgroundColor: [
+                            '#e74c3c',
+                            '#2ecc71',
+                            '#3498db',
+                            '#f39c12'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Phân bố tương tác'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}
+
+<div class="app-container">
+    <!-- Main Content -->
+    <div class="main-content">
+        <main class="content-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Tương Tác</h1>
+                <div class="page-actions">
+                    <div class="filter-group">
+                        <label for="time-range">Thời gian:</label>
+                        @{
+                            var options = new[] { 7, 30, -1 }; // -1 đại diện cho "Tất cả"
+                            int selectedDays = ViewBag.SelectedDays ?? 30;
+                        }
+                        <select id="time-range" class="select-control" onchange="applyTimeRange(this.value)">
+                            @foreach (var days in options)
+                            {
+                                if (days == -1) 
+                                {
+                                    if (selectedDays == -1)
+                                    {
+                                        <option value="-1" selected>Tất cả</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="-1">Tất cả</option>
+                                    }
+                                }
+                                else 
+                                {
+                                    if (days == selectedDays)
+                                    {
+                                        <option value="@days" selected>@days ngày</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@days">@days ngày</option>
+                                    }
+                                }
+                            }
+                            @if (selectedDays != 7 && selectedDays != 30 && selectedDays != -1)
+                            {
+                                <option value="0" selected>Tùy chỉnh</option>
+                            }
+                            else
+                            {
+                                <option value="0">Tùy chỉnh</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div id="expanded-filters" class="expanded-filters" style="display: @(ViewBag.SelectedDays != 7 && ViewBag.SelectedDays != 30 && ViewBag.SelectedDays != -1 ? "block" : "none");">
+                <form id="date-filter-form" method="get" action="@Url.Action("Interactions", "Admin")">
+                    <div class="date-range-filter">
+                        <div>
+                            <span class="filter-label">Từ ngày:</span>
+                            <input type="date" id="fromDate" name="fromDate" class="date-input" value="@ViewBag.FromDate">
+                        </div>
+                        <div>
+                            <span class="filter-label">Đến ngày:</span>
+                            <input type="date" id="toDate" name="toDate" class="date-input" value="@ViewBag.ToDate">
+                        </div>
+                        <div class="filter-actions">
+                            <button type="submit" class="filter-btn">
+                                <i class="fas fa-filter"></i> Lọc
+                            </button>
+                            <button type="button" id="reset-filter" class="reset-btn">
+                                <i class="fas fa-undo"></i> Đặt lại
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Hidden input để giữ giá trị timeRange khi form được submit -->
+                    <input type="hidden" id="timeRange" name="timeRange" value="0">
+                </form>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stats-card">
+                    <div class="stats-card-content">
+                        <div>
+                            <p class="stats-card-label">Tổng lượt thích bài viết</p>
+                            <p class="stats-card-value">@ViewBag.TotalPostFavorites</p>
+                        </div>
+                        <div class="stats-card-icon red">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        @if (ViewBag.PostFavoritesGrowth > 0)
+                        {
+                            <span class="stats-trend positive">+@ViewBag.PostFavoritesGrowth%</span>
+                        }
+                        else
+                        {
+                            <span class="stats-trend negative">@ViewBag.PostFavoritesGrowth%</span>
+                        }
+                        so với kỳ trước
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="stats-card-content">
+                        <div>
+                            <p class="stats-card-label">Tổng lượt chia sẻ bài viết</p>
+                            <p class="stats-card-value">@ViewBag.TotalPostShares</p>
+                        </div>
+                        <div class="stats-card-icon green">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        @if (ViewBag.PostSharesGrowth > 0)
+                        {
+                            <span class="stats-trend positive">+@ViewBag.PostSharesGrowth%</span>
+                        }
+                        else
+                        {
+                            <span class="stats-trend negative">@ViewBag.PostSharesGrowth%</span>
+                        }
+                        so với kỳ trước
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="stats-card-content">
+                        <div>
+                            <p class="stats-card-label">Tổng lượt thích địa điểm</p>
+                            <p class="stats-card-value">@ViewBag.TotalSpotFavorites</p>
+                        </div>
+                        <div class="stats-card-icon blue">
+                            <i class="fas fa-heart"></i>
+                        </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        @if (ViewBag.SpotFavoritesGrowth > 0)
+                        {
+                            <span class="stats-trend positive">+@ViewBag.SpotFavoritesGrowth%</span>
+                        }
+                        else
+                        {
+                            <span class="stats-trend negative">@ViewBag.SpotFavoritesGrowth%</span>
+                        }
+                        so với kỳ trước
+                    </div>
+                </div>
+
+                <div class="stats-card">
+                    <div class="stats-card-content">
+                        <div>
+                            <p class="stats-card-label">Tổng lượt chia sẻ địa điểm</p>
+                            <p class="stats-card-value">@ViewBag.TotalSpotShares</p>
+                        </div>
+                        <div class="stats-card-icon amber">
+                            <i class="fas fa-share-alt"></i>
+                        </div>
+                    </div>
+                    <div class="stats-card-footer">
+                        @if (ViewBag.SpotSharesGrowth > 0)
+                        {
+                            <span class="stats-trend positive">+@ViewBag.SpotSharesGrowth%</span>
+                        }
+                        else
+                        {
+                            <span class="stats-trend negative">@ViewBag.SpotSharesGrowth%</span>
+                        }
+                        so với kỳ trước
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-grid">
+                <div class="chart-card large">
+                    <h2 class="chart-title">Tương tác theo thời gian</h2>
+                    <div class="chart-container">
+                        <canvas id="interactionsChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="chart-card">
+                    <h2 class="chart-title">Phân bố tương tác</h2>
+                    <div class="chart-container">
+                        <canvas id="distributionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Posts -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Bài viết có nhiều tương tác nhất</h2>
+                    <a href="@Url.Action("Index", "Posts")" class="view-all">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tiêu đề</th>
+                                <th>Loại</th>
+                                <th>Lượt thích</th>
+                                <th>Lượt chia sẻ</th>
+                                <th>Tổng tương tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var post in ViewBag.TopPosts)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="table-title-cell">
+                                            <a href="@Url.Action("Details", "Posts", new { id = post.PostId })">@post.Title</a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @{
+                                            string badgeClass = post.TypeOfPost == "Địa điểm" ? "blue" : 
+                                                               post.TypeOfPost == "Cẩm nang" ? "green" : "amber";
+                                            string icon = post.TypeOfPost == "Địa điểm" ? "map-marker-alt" : 
+                                                         post.TypeOfPost == "Cẩm nang" ? "book" : "star";
+                                        }
+                                        <span class="badge @badgeClass">
+                                            <i class="fas fa-@icon"></i>
+                                            @post.TypeOfPost
+                                        </span>
+                                    </td>
+                                    <td>@post.FavoritesCount</td>
+                                    <td>@post.SharesCount</td>
+                                    <td>
+                                        <span class="total-interactions">@(post.FavoritesCount + post.SharesCount)</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Top Tourist Spots -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Địa điểm du lịch có nhiều tương tác nhất</h2>
+                    <a href="@Url.Action("Index", "TouristSpots")" class="view-all">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Tên địa điểm</th>
+                                <th>Danh mục</th>
+                                <th>Lượt thích</th>
+                                <th>Lượt chia sẻ</th>
+                                <th>Tổng tương tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var spot in ViewBag.TopSpots)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="table-title-cell">
+                                            <a href="@Url.Action("Details", "TouristSpots", new { id = spot.SpotId })">@spot.Name</a>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge blue">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            @spot.CategoryName
+                                        </span>
+                                    </td>
+                                    <td>@spot.FavoritesCount</td>
+                                    <td>@spot.SharesCount</td>
+                                    <td>
+                                        <span class="total-interactions">@(spot.FavoritesCount + spot.SharesCount)</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Interactions -->
+            <div class="table-card">
+                <div class="table-header">
+                    <h2 class="table-title">Người dùng tương tác nhiều nhất</h2>
+                    <a href="@Url.Action("Users", "Admin")" class="view-all">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Người dùng</th>
+                                <th>Thích bài viết</th>
+                                <th>Chia sẻ bài viết</th>
+                                <th>Thích địa điểm</th>
+                                <th>Chia sẻ địa điểm</th>
+                                <th>Tổng tương tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in ViewBag.TopUsers)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="user-cell">
+                                            <div class="user-avatar">
+                                                <img src="@(string.IsNullOrEmpty(user.AvatarUrl) ? "/images/default-avatar.png" : user.AvatarUrl)" alt="Avatar">
+                                            </div>
+                                            <div class="user-info">
+                                                <div class="user-name">@user.FullName</div>
+                                                <div class="user-email">@user.Email</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@user.PostFavoritesCount</td>
+                                    <td>@user.PostSharesCount</td>
+                                    <td>@user.SpotFavoritesCount</td>
+                                    <td>@user.SpotSharesCount</td>
+                                    <td>
+                                        <span class="total-interactions">@(user.PostFavoritesCount + user.PostSharesCount + user.SpotFavoritesCount + user.SpotSharesCount)</span>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

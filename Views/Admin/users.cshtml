@@ -1,0 +1,478 @@
+@using TourismWeb.Models
+@using System.Web;
+
+@{
+    var users = ViewBag.Users as List<User> ?? new List<User>();
+    var totalUsers = (int)(ViewBag.TotalUsers ?? 0);
+    var pageNumber = (int)(ViewBag.PageNumber ?? 1);
+    var pageSize = (int)(ViewBag.PageSize ?? 10);
+    var totalPages = (int)(ViewBag.TotalPages ?? 1);
+
+    // Lấy giá trị filter hiện tại
+    var currentSearchTerm = ViewBag.SearchTerm as string ?? "";
+    var currentRoleFilter = ViewBag.RoleFilter as string ?? "all";
+    var currentStatusFilter = ViewBag.StatusFilter as string ?? "all";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/cssadmin/users.css">
+    <link rel="stylesheet" href="~/cssadmin/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+@{
+    ViewData["Title"] = "Quản Lý Người Dùng - Hệ Thống Quản Trị";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Scripts {
+    <script src="~/js/jsadmin/users.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const filterButton = document.querySelector('.btn-filter');
+            const searchInput = document.querySelector('.search-input input');
+            @* const roleSelect = document.querySelectorAll('.select-control')[0]; // Vai trò
+            const statusSelect = document.querySelectorAll('.select-control')[1]; // Trạng thái *@
+            const roleSelect = document.getElementById('roleFilter');
+const statusSelect = document.getElementById('statusFilter');
+            const pageSizeSelect = document.querySelector('.pagination-info .select-sm');
+
+            // Thiết lập giá trị ban đầu cho các filter controls
+            if (searchInput) searchInput.value = "@Html.Raw(HttpUtility.JavaScriptStringEncode(currentSearchTerm))"; // Encode để tránh lỗi XSS hoặc JS
+            if (roleSelect) roleSelect.value = "@currentRoleFilter";
+            if (statusSelect) statusSelect.value = "@currentStatusFilter";
+            if (pageSizeSelect) pageSizeSelect.value = "@pageSize";
+
+            @* if (filterButton) {
+                filterButton.addEventListener('click', function () {
+                    const searchTerm = searchInput ? searchInput.value : '';
+                    const role = roleSelect ? roleSelect.value : 'all';
+                    const status = statusSelect ? statusSelect.value : 'all';
+                    const currentPgSize = pageSizeSelect ? pageSizeSelect.value : '10';
+                    window.location.href = `@Url.Action("Users", "Admin")?searchTerm=${encodeURIComponent(searchTerm)}&roleFilter=${role}&statusFilter=${status}&pageSize=${currentPgSize}&pageNumber=1`;
+                });
+            } *@
+
+            if (filterButton) {
+    filterButton.addEventListener('click', function () {
+        const searchTerm = searchInput ? searchInput.value.trim() : '';
+        
+        // SỬA LẠI LOGIC LẤY GIÁ TRỊ TẠI ĐÂY
+        // Nếu select box tồn tại và có giá trị (không rỗng) thì lấy giá trị đó, nếu không thì mặc định là 'all'
+        const role = (roleSelect && roleSelect.value) ? roleSelect.value : 'all';
+        const status = (statusSelect && statusSelect.value) ? statusSelect.value : 'all';
+        
+        const currentPgSize = pageSizeSelect ? pageSizeSelect.value : '10';
+        
+        const url = `@Url.Action("Users", "Admin")?searchTerm=${encodeURIComponent(searchTerm)}&roleFilter=${role}&statusFilter=${status}&pageSize=${currentPgSize}&pageNumber=1`;
+        window.location.href = url;
+    });
+}
+
+            if (pageSizeSelect) {
+                pageSizeSelect.addEventListener('change', function() {
+                    const searchTerm = searchInput ? searchInput.value : ''; // Lấy giá trị hiện tại từ input
+                    const role = roleSelect ? roleSelect.value : 'all';       // Lấy giá trị hiện tại từ select
+                    const status = statusSelect ? statusSelect.value : 'all';   // Lấy giá trị hiện tại từ select
+                    const newPageSize = this.value;
+                    window.location.href = `@Url.Action("Users", "Admin")?searchTerm=${encodeURIComponent(searchTerm)}&roleFilter=${role}&statusFilter=${status}&pageSize=${newPageSize}&pageNumber=1`;
+                });
+            }
+
+            // Pagination buttons
+            // Sử dụng ID nếu bạn đã thêm vào HTML, nếu không thì giữ nguyên selector hiện tại
+            const prevButton = document.getElementById('prevPageBtn') || document.querySelector('.pagination button:first-child');
+            const nextButton = document.getElementById('nextPageBtn') || document.querySelector('.pagination button:last-child');
+
+            console.log("Script loaded. PageNumber:", @pageNumber, "TotalPages:", @totalPages);
+            console.log("Prev Button:", prevButton, "Is Disabled:", prevButton ? prevButton.disabled : 'null');
+            console.log("Next Button:", nextButton, "Is Disabled:", nextButton ? nextButton.disabled : 'null');
+            if (prevButton && !prevButton.disabled) {
+    prevButton.addEventListener('click', function() {
+        const targetPage = @pageNumber - 1;
+        const url = `@Url.Action("Users", "Admin")?searchTerm=${encodeURIComponent("@Html.Raw(HttpUtility.JavaScriptStringEncode(currentSearchTerm))")}&roleFilter=@currentRoleFilter&statusFilter=@currentStatusFilter&pageSize=@pageSize&pageNumber=${targetPage}`;
+        console.log("Prev button clicked. Target URL:", url);
+        window.location.href = url;
+    });
+} else if (prevButton) {
+    console.log("Prev button is disabled or not found.");
+}
+            if (nextButton && !nextButton.disabled) {
+    nextButton.addEventListener('click', function() {
+        const targetPage = @pageNumber + 1;
+        const url = `@Url.Action("Users", "Admin")?searchTerm=${encodeURIComponent("@Html.Raw(HttpUtility.JavaScriptStringEncode(currentSearchTerm))")}&roleFilter=@currentRoleFilter&statusFilter=@currentStatusFilter&pageSize=@pageSize&pageNumber=${targetPage}`;
+        console.log("Next button clicked. Target URL:", url);
+        window.location.href = url;
+    });
+} else if (nextButton) {
+    console.log("Next button is disabled or not found.");
+}
+
+             const addUserButton = document.querySelector('.page-actions .btn-primary');
+             const userModal = document.getElementById('userModal');
+             const closeModalButtons = document.querySelectorAll('.modal-close, #cancelUser');
+
+             if (addUserButton && userModal) {
+                 addUserButton.addEventListener('click', () => {
+                     document.getElementById('userForm').reset();
+                     document.querySelector('#userModal .modal-title').textContent = 'Thêm người dùng mới';
+                     userModal.style.display = 'block';
+                 });
+             }
+
+             closeModalButtons.forEach(btn => {
+                 btn.addEventListener('click', () => {
+                     if (userModal) userModal.style.display = 'none';
+                     const deleteModal = document.getElementById('deleteModal');
+                     if (deleteModal) deleteModal.style.display = 'none';
+                 });
+             });
+
+             window.addEventListener('click', (event) => {
+                 if (event.target === userModal) {
+                     userModal.style.display = 'none';
+                 }
+                 const deleteModal = document.getElementById('deleteModal');
+                 if (event.target === deleteModal) {
+                     deleteModal.style.display = 'none';
+                 }
+             });
+
+            document.querySelectorAll('.delete-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.dataset.userId;
+                    const userName = this.dataset.userName;
+                    const deleteModal = document.getElementById('deleteModal');
+                    const deleteUserNameSpan = document.getElementById('deleteUserName');
+                    const confirmDeleteButton = document.getElementById('confirmDelete');
+
+                    if (deleteUserNameSpan) deleteUserNameSpan.textContent = userName;
+                    if (confirmDeleteButton) confirmDeleteButton.dataset.userIdToDelete = userId;
+                    if (deleteModal) deleteModal.style.display = 'block';
+                });
+            });
+
+             document.querySelectorAll('.edit-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const userId = this.dataset.userId;
+                    alert('Chức năng sửa cho User ID: ' + userId + ' chưa được triển khai đầy đủ.');
+                });
+            });
+        });
+    </script>
+}
+
+<div class="app-container">
+    <!-- Main Content -->
+    <div class="main-content">
+        <main class="content-wrapper">
+            <div class="page-header">
+                <h1 class="page-title">Quản Lý Người Dùng</h1>
+            </div>
+
+            <!-- Filter Section -->
+            <div class="filter-card">
+                <div class="filter-grid">
+                    <div class="filter-item">
+                        <div class="search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" placeholder="Tìm kiếm người dùng..." value="@currentSearchTerm">
+                        </div>
+                    </div>
+<div class="filter-item">
+    <select class="select-control" id="roleFilter">
+        @if (currentRoleFilter == "all")
+        {
+            <option value="all" selected>Tất cả vai trò</option>
+        }
+        else
+        {
+            <option value="all">Tất cả vai trò</option>
+        }
+        
+        @if (currentRoleFilter == "Admin")
+        {
+            <option value="Admin" selected>Quản trị viên</option>
+        }
+        else
+        {
+            <option value="Admin">Quản trị viên</option>
+        }
+        
+        @if (currentRoleFilter == "User")
+        {
+            <option value="User" selected>Người dùng</option>
+        }
+        else
+        {
+            <option value="User">Người dùng</option>
+        }
+    </select>
+</div>
+
+<!-- Sửa lại phần select cho Status Filter -->
+<div class="filter-item">
+    <select class="select-control" id="statusFilter">
+        @if (currentStatusFilter == "all")
+        {
+            <option value="all" selected>Tất cả trạng thái</option>
+        }
+        else
+        {
+            <option value="all">Tất cả trạng thái</option>
+        }
+        
+        @if (currentStatusFilter == "Hoạt động")
+        {
+            <option value="Hoạt động" selected>Hoạt động</option>
+        }
+        else
+        {
+            <option value="Hoạt động">Hoạt động</option>
+        }
+        
+        @if (currentStatusFilter == "Không hoạt động")
+        {
+            <option value="Không hoạt động" selected>Không hoạt động</option>
+        }
+        else
+        {
+            <option value="Không hoạt động">Không hoạt động</option>
+        }
+        
+        @if (currentStatusFilter == "Bị cấm")
+        {
+            <option value="Bị cấm" selected>Bị cấm</option>
+        }
+        else
+        {
+            <option value="Bị cấm">Bị cấm</option>
+        }
+    </select>
+</div>
+
+                    <div class="filter-item">
+                        <button class="btn btn-filter">
+                            <i class="fas fa-filter"></i>
+                            Lọc
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    <div class="checkbox-wrapper">
+                                        <input type="checkbox" id="select-all">
+                                        <label for="select-all"></label>
+                                    </div>
+                                </th>
+                                <th>Người dùng</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th>Bài viết</th>
+                                <th>Ngày tham gia</th>
+                                <th>Trạng thái</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (users.Any())
+                            {
+                                @foreach (var user in users)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="checkbox-wrapper">
+                                                <input type="checkbox" id="user-@user.UserId" class="row-checkbox">
+                                                <label for="user-@user.UserId"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="user-cell">
+                                                <div class="user-avatar">
+                                                    <img src="@Url.Content(user.AvatarUrl ?? "/images/default-avatar.png")" alt="Avatar @user.FullName">
+                                                </div>
+                                                <div class="user-info">
+                                                    <div class="user-name">@user.FullName</div>
+                                                    <div class="user-username">@@@user.Username</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@user.Email</td>
+                                        <td>
+                                            @{
+                                                string roleClass = "amber"; // Mặc định
+                                                if (user.Role == "Admin") { roleClass = "purple"; }
+                                                else if (user.Role == "Editor") { roleClass = "blue"; } // Ví dụ
+                                                else if (user.Role == "Author") { roleClass = "green"; } // Ví dụ
+                                            }
+                                            <span class="badge @roleClass">@user.Role</span>
+                                        </td>
+                                        <td>@(user.Posts?.Count ?? 0)</td>
+                                        <td>
+                                            <div class="date-cell">
+                                                <i class="fas fa-calendar"></i>
+                                                @user.CreatedAt.ToString("dd/MM/yyyy")
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @{
+                                                string statusClass = "green"; 
+                                                if (user.UserStatus == "Không hoạt động") { statusClass = "yellow"; }
+                                                else if (user.UserStatus == "Bị cấm") { statusClass = "red"; }
+                                            }
+                                            <span class="badge @statusClass">@(user.UserStatus ?? "N/A")</span>
+                                        </td>
+                                        <td class="actions-cell">
+                                            <button class="action-btn view-btn" title="Xem" data-user-id="@user.UserId">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit-btn" title="Sửa" data-user-id="@user.UserId">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete-btn" title="Xóa" data-user-id="@user.UserId" data-user-name="@user.FullName">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="8" class="text-center">Không tìm thấy người dùng nào.</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span>Hiển thị
+                            <select class="select-sm">
+                                <option value="5" selected="@(pageSize == 5)">5</option>
+                                <option value="10" selected="@(pageSize == 10)">10</option>
+                                <option value="25" selected="@(pageSize == 25)">25</option>
+                                <option value="50" selected="@(pageSize == 50)">50</option>
+                            </select>
+                            trên tổng số @totalUsers người dùng
+                        </span>
+                    </div>
+                    <div class="pagination">
+                        <button id="prevPageBtn" class="pagination-btn" disabled="@(pageNumber <= 1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span class="pagination-text">Trang @pageNumber / @totalPages</span>
+                        <button id="nextPageBtn" class="pagination-btn" disabled="@(pageNumber >= totalPages)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<!-- User Modal -->
+<div class="modal" id="userModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 class="modal-title">Thêm người dùng mới</h2>
+            <button class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <form id="userForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="fullname">Họ và tên <span class="required">*</span></label>
+                        <input type="text" id="fullname" name="fullname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="username">Tên đăng nhập <span class="required">*</span></label>
+                        <input type="text" id="username" name="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Email <span class="required">*</span></label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">Số điện thoại</label>
+                        <input type="tel" id="phone" name="phone">
+                    </div>
+                    <div class="form-group">
+                        <label for="role">Vai trò <span class="required">*</span></label>
+                        <select id="role" name="role" required>
+                            <option value="user">Người dùng</option>
+                            <option value="user">Người dùng</option>
+                            <option value="user">Người dùng</option>
+                            <option value="user" selected>Người dùng</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="status">Trạng thái</label>
+                        <select id="status" name="status">
+                            <option value="active" selected>Hoạt động</option>
+                            <option value="inactive">Không hoạt động</option>
+                            <option value="banned">Bị cấm</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Mật khẩu <span class="required">*</span></label>
+                        <div class="input-with-icon">
+                            <input type="password" id="password" name="password" required>
+                            <button type="button" class="toggle-password" title="Hiện/ẩn mật khẩu">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">Xác nhận mật khẩu <span class="required">*</span></label>
+                        <div class="input-with-icon">
+                            <input type="password" id="confirm-password" name="confirm-password" required>
+                            <button type="button" class="toggle-password" title="Hiện/ẩn mật khẩu">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="bio">Giới thiệu</label>
+                    <textarea id="bio" name="bio" rows="3"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelUser">Hủy</button>
+                    <button type="submit" class="btn btn-primary">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal" id="deleteModal">
+    <div class="modal-content modal-sm">
+        <div class="modal-header">
+            <h2 class="modal-title">Xác nhận xóa người dùng</h2>
+            <button class="modal-close">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="modal-body">
+            <p>Bạn có chắc chắn muốn xóa người dùng "<span id="deleteUserName"></span>"?</p>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" id="cancelDelete">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>

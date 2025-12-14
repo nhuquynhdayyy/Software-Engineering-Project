@@ -1,0 +1,331 @@
+@* @model TourismWeb.Models.Report
+@{
+    ViewData["Title"] = "Báo cáo nội dung";
+}
+
+<h2>Báo cáo nội dung</h2>
+
+<form asp-action="Create" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="TargetType" />
+<input type="hidden" asp-for="TargetId" />
+<input type="hidden" asp-for="ReportedUserId" />
+
+<div class="form-group">
+    <label asp-for="TypeOfReport">Loại báo cáo</label>
+    <select asp-for="TypeOfReport" asp-items="Html.GetEnumSelectList<ReportType>()" class="form-control">
+        <option value="">-- Chọn --</option>
+    </select>
+    <span asp-validation-for="TypeOfReport" class="text-danger"></span>
+</div>
+
+    <div class="form-group">
+        <label asp-for="Reason">Lý do</label>
+        <textarea asp-for="Reason" class="form-control" rows="4" placeholder="Mô tả chi tiết lý do báo cáo..."></textarea>
+        <span asp-validation-for="Reason" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-danger">Gửi báo cáo</button>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+} *@
+@model TourismWeb.Models.Report
+@{
+    ViewData["Title"] = "Báo cáo nội dung";
+}
+
+<style>
+    .report-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .report-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 2px;
+        box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+        margin-bottom: 2rem;
+    }
+
+    .report-card-inner {
+        background: #ffffff;
+        border-radius: 18px;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .report-card-inner::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
+    }
+
+    .report-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .report-title {
+        font-size: 2rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .report-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+        font-weight: 400;
+    }
+
+    .modern-form-group {
+        margin-bottom: 2rem;
+        position: relative;
+    }
+
+    .modern-label {
+        display: block;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.75rem;
+        font-size: 0.95rem;
+        letter-spacing: 0.025em;
+    }
+
+    .modern-select,
+    .modern-textarea {
+        width: 100%;
+        padding: 1rem 1.25rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: #ffffff;
+        color: #374151;
+        outline: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .modern-select:focus,
+    .modern-textarea:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1), 0 4px 6px rgba(0, 0, 0, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .modern-select:hover,
+    .modern-textarea:hover {
+        border-color: #d1d5db;
+    }
+
+    .modern-textarea {
+        resize: vertical;
+        min-height: 120px;
+        font-family: inherit;
+        line-height: 1.5;
+    }
+
+    .modern-textarea::placeholder {
+        color: #9ca3af;
+        font-style: italic;
+    }
+
+    .modern-btn {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+        color: white;
+        border: none;
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.025em;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .modern-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        transition: left 0.5s;
+    }
+
+    .modern-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+    }
+
+    .modern-btn:hover::before {
+        left: 100%;
+    }
+
+    .modern-btn:active {
+        transform: translateY(0);
+    }
+
+    .error-message {
+        color: #ef4444;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .form-icon {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+        font-size: 1.25rem;
+    }
+
+    .select-wrapper {
+        position: relative;
+    }
+
+    .select-wrapper::after {
+        content: '▼';
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #9ca3af;
+        pointer-events: none;
+        font-size: 0.75rem;
+    }
+
+    .modern-select {
+        appearance: none;
+        background-image: none;
+        padding-right: 3rem;
+    }
+
+    @@media (max-width: 768px) {
+        .report-container {
+            margin: 1rem auto;
+            padding: 0 0.5rem;
+        }
+        
+        .report-card-inner {
+            padding: 1.5rem;
+        }
+        
+        .report-title {
+            font-size: 1.5rem;
+        }
+    }
+
+    /* Animation cho form khi load */
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .report-card {
+        animation: slideUp 0.6s ease-out;
+    }
+</style>
+
+<div class="report-container">
+    <div class="report-card">
+        <div class="report-card-inner">
+            <div class="report-header">
+                <h2 class="report-title">Báo cáo nội dung</h2>
+                <p class="report-subtitle">Giúp chúng tôi duy trì cộng đồng an toàn và tích cực</p>
+            </div>
+
+            <form asp-action="Create" method="post">
+                @Html.AntiForgeryToken()
+                <input type="hidden" asp-for="TargetType" />
+                <input type="hidden" asp-for="TargetId" />
+                <input type="hidden" asp-for="ReportedUserId" />
+
+                <div class="modern-form-group">
+                    <label asp-for="TypeOfReport" class="modern-label">
+                        🏷️ Loại báo cáo
+                    </label>
+                    <div class="select-wrapper">
+                        <select asp-for="TypeOfReport" asp-items="Html.GetEnumSelectList<ReportType>()" class="modern-select">
+                            <option value="">-- Chọn loại báo cáo --</option>
+                        </select>
+                    </div>
+                    <span asp-validation-for="TypeOfReport" class="error-message">⚠️</span>
+                </div>
+
+                <div class="modern-form-group">
+                    <label asp-for="Reason" class="modern-label">
+                        📝 Lý do chi tiết
+                    </label>
+                    <textarea asp-for="Reason" class="modern-textarea" rows="4" placeholder="Vui lòng mô tả chi tiết lý do báo cáo để chúng tôi có thể xử lý một cách phù hợp nhất..."></textarea>
+                    <span asp-validation-for="Reason" class="error-message">⚠️</span>
+                </div>
+
+                <button type="submit" class="modern-btn">
+                    <span>🚨</span>
+                    Gửi báo cáo
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Thêm một chút JavaScript để tăng tính tương tác
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const submitBtn = document.querySelector('.modern-btn');
+            
+            // Thêm loading state khi submit
+            form.addEventListener('submit', function() {
+                submitBtn.innerHTML = '<span>⏳</span> Đang gửi...';
+                submitBtn.disabled = true;
+            });
+            
+            // Thêm hiệu ứng cho validation errors
+            const errorMessages = document.querySelectorAll('.error-message');
+            errorMessages.forEach(function(error) {
+                if (error.textContent.trim() && error.textContent.trim() !== '⚠️') {
+                    error.style.display = 'flex';
+                    error.style.animation = 'slideUp 0.3s ease-out';
+                }
+            });
+        });
+    </script>
+}

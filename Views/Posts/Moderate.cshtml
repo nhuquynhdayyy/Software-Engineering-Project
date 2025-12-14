@@ -1,0 +1,443 @@
+@model IEnumerable<TourismWeb.Models.Post>
+
+@{
+    ViewData["Title"] = "Quản Lý Bài Viết";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/cssadmin/posts.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/cssadmin/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @* body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #f8f9fc;
+        }
+         *@
+        .app-container {
+            padding: 20px;
+            min-height: 100vh;
+            background-color: #f8f9fc;
+        }
+        
+        .main-content {
+            @* background-color: #fff; *@
+            border-radius: 8px;
+            /* box-shadow: 0 2px 10px rgba(0,0,0,0.05); */
+            box-shadow: none;
+            overflow: hidden;
+        }
+        
+        .content-wrapper {
+            padding: 20px;
+            position: relative;
+        }
+        
+        .toggle-sidebar {
+            position: absolute;
+            left: 20px;
+            top: 20px;
+          
+            border: none;
+            font-size: 18px;
+            color: white;
+            cursor: pointer;
+            z-index: 5;
+            height: 40px;
+            width: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(110, 71, 239, 0.3);
+        }
+        
+        .page-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            margin-left: 60px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: #333;
+            margin: 0;
+        }
+        
+        .filter-card {
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn-group .btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+            transition: all 0.2s;
+            text-decoration: none;
+            border: 1px solid transparent;
+        }
+        
+        .btn-outline-primary {
+            color: #fff;
+            background-color: #6e47ef;
+        }
+        
+        .btn-outline-primary:hover, .btn-outline-primary.hover {
+            background-color: #5a35d9;
+            color: #fff;
+        }
+        
+        .btn-outline-warning {
+            color: #fff;
+            background-color: #f6c23e;
+        }
+        
+        .btn-outline-warning:hover, .btn-outline-warning.hover {
+            background-color: #e5b22e;
+            color: #fff;
+        }
+        
+        .btn-outline-success {
+            color: #fff;
+            background-color: #1cc88a;
+        }
+        
+        .btn-outline-success:hover, .btn-outline-success.hover {
+            background-color: #15a979;
+            color: #fff;
+        }
+        
+        .btn-outline-danger {
+            color: #fff;
+            background-color: #e74a3b;
+        }
+        
+        .btn-outline-danger:hover, .btn-outline-danger.hover {
+            background-color: #d6392a;
+            color: #fff;
+        }
+        
+        .table-card {
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            min-height: 0.01%;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .data-table thead {
+            background-color: #f8f9fc;
+        }
+        
+        .data-table th {
+            padding: 12px 15px;
+            font-weight: 600;
+            color: #333;
+            text-align: left;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .data-table td {
+            padding: 12px 15px;
+            vertical-align: middle;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        
+        .data-row:hover {
+            background-color: #f8f9fc;
+        }
+        
+        .table-title-cell {
+            font-weight: 500;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .table-content-preview {
+            font-size: 13px;
+            color: #666;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            max-width: 300px;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge.green {
+            background-color: #e6f7f0;
+            color: #1cc88a;
+        }
+        
+        .badge.yellow {
+            background-color: #fff8e6;
+            color: #f6c23e;
+        }
+        
+        .badge.red {
+            background-color: #fcecea;
+            color: #e74a3b;
+        }
+        
+        .badge.blue {
+            background-color: #eef1fe;
+            color: #4e73df;
+        }
+        
+        .badge.amber {
+            background-color: #fff4e6;
+            color: #ff9800;
+        }
+        
+        .badge.gray {
+            background-color: #f1f3f5;
+            color: #6c757d;
+        }
+        
+        .actions-cell {
+            display: flex;
+            gap: 8px;
+            justify-content: flex-start;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: #fff;
+            transition: all 0.2s;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+        
+        .view-btn {
+            background-color: #36b9cc;
+        }
+        
+        .edit-btn {
+            background-color: #4e73df;
+        }
+        
+        .approve-btn {
+            background-color: #1cc88a;
+        }
+        
+        .reject-btn {
+            background-color: #e74a3b;
+        }
+        
+        .delete-btn {
+            background-color: #e74a3b;
+        }
+        
+        /* Responsive adjustments */
+        @@media (max-width: 992px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
+            
+            .actions-cell {
+                flex-wrap: wrap;
+            }
+        }
+        
+        @@media (max-width: 768px) {
+            .data-table th, .data-table td {
+                padding: 10px 8px;
+            }
+            
+            .table-content-preview {
+                max-width: 200px;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <script src="~/js/jsadmin/posts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle sidebar functionality
+            const toggleBtn = document.querySelector('.toggle-sidebar');
+            toggleBtn.addEventListener('click', function() {
+                document.body.classList.toggle('sidebar-collapsed');
+                this.classList.toggle('active');
+            });
+        });
+    </script>
+}
+
+<div class="app-container">
+    <div class="main-content">
+        <main class="content-wrapper">
+            <button class="toggle-sidebar">
+                <i class="fas fa-bars"></i>
+            </button>
+
+            <div class="page-header">
+                <h1 class="page-title">Quản Lý Bài Viết</h1>
+            </div>
+
+            <div class="filter-card">
+                @{
+                    var currentStatus = ViewContext.RouteData.Values["status"]?.ToString();
+                }
+                <div class="btn-group" role="group">
+                    <a asp-action="Moderate" asp-route-status="" class="btn btn-outline-primary @(string.IsNullOrEmpty(currentStatus) ? "hover" : "")">Tất cả</a>
+                    <a asp-action="Moderate" asp-route-status="Pending" class="btn btn-outline-warning @(currentStatus == "Pending" ? "hover" : "")">Chờ duyệt</a>
+                    <a asp-action="Moderate" asp-route-status="Approved" class="btn btn-outline-success @(currentStatus == "Approved" ? "hover" : "")">Đã duyệt</a>
+                    <a asp-action="Moderate" asp-route-status="Rejected" class="btn btn-outline-danger @(currentStatus == "Rejected" ? "hover" : "")">Từ chối</a>
+                </div>
+            </div>
+
+            <div class="table-card">
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 5%">STT</th>
+                                <th style="width: 20%">TIÊU ĐỀ</th>
+                                <th style="width: 10%">LOẠI</th>
+                                <th style="width: 15%">TÁC GIẢ</th>
+                                <th style="width: 15%">NGÀY ĐĂNG</th>
+                                <th style="width: 15%">TRẠNG THÁI</th>
+                                <th style="width: 20%">HÀNH ĐỘNG</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                int index = 1; // Khởi tạo biến đếm
+                            }
+                            @foreach (var item in Model)
+                            {
+                                var badgeClass = item.Status switch
+                                {
+                                    TourismWeb.Models.PostStatus.Pending => "badge yellow",
+                                    TourismWeb.Models.PostStatus.Approved => "badge green",
+                                    TourismWeb.Models.PostStatus.Rejected => "badge red",
+                                    _ => "badge gray"
+                                };
+
+                                var badgeText = item.Status switch
+                                {
+                                    TourismWeb.Models.PostStatus.Pending => "Chờ duyệt",
+                                    TourismWeb.Models.PostStatus.Approved => "Đã duyệt",
+                                    TourismWeb.Models.PostStatus.Rejected => "Từ chối",
+                                    _ => "Không xác định"
+                                };
+
+                                var typeBadgeClass = item.TypeOfPost switch
+                                {
+                                    "Địa điểm" => "badge blue",
+                                    "Cẩm nang" => "badge green",
+                                    "Trải nghiệm" => "badge amber",
+                                    _ => "badge gray"
+                                };
+
+                                <tr class="data-row">
+                                    <td>@index</td> <!-- Hiển thị số thứ tự -->
+                                    <td>
+                                        <div class="table-title-cell">@item.Title</div>
+                                        <div class="table-content-preview">@Html.Raw(item.Content?.Substring(0, Math.Min(100, item.Content?.Length ?? 0)))@((item.Content?.Length ?? 0) > 100 ? "..." : "")</div>
+                                    </td>
+                                    <td>
+                                        <span class="@typeBadgeClass">
+                                            @if (item.TypeOfPost == "Địa điểm")
+                                            {
+                                                @:<i class="fas fa-map-marker-alt"></i> Địa điểm
+                                            }
+                                            else if (item.TypeOfPost == "Cẩm nang")
+                                            {
+                                                @:<i class="fas fa-book"></i> Cẩm nang
+                                            }
+                                            else
+                                            {
+                                                @:<i class="fas fa-star"></i> Trải nghiệm
+                                            }
+                                        </span>
+                                    </td>
+                                    <td>@item.User?.FullName</td>
+                                    <td>@item.CreatedAt.ToString("dd/MM/yyyy")</td>
+                                    <td><span class="@badgeClass">@badgeText</span></td>
+                                    <td>
+                                        <div class="actions-cell">
+                                            <a asp-action="Details" asp-route-id="@item.PostId" class="action-btn view-btn" title="Xem"><i class="fas fa-eye"></i></a>
+                                            <a asp-action="Edit" asp-route-id="@item.PostId" class="action-btn edit-btn" title="Sửa"><i class="fas fa-edit"></i></a>
+
+                                            @if (item.Status == TourismWeb.Models.PostStatus.Pending)
+                                            {
+                                                <form asp-action="Approve" asp-route-id="@item.PostId" method="post" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="action-btn approve-btn" title="Duyệt"><i class="fas fa-check"></i></button>
+                                                </form>
+                                                <form asp-action="Reject" asp-route-id="@item.PostId" method="post" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="action-btn reject-btn" title="Từ chối"><i class="fas fa-times"></i></button>
+                                                </form>
+                                            }
+                                            else if (item.Status == TourismWeb.Models.PostStatus.Approved)
+                                            {
+                                                <form asp-action="Reject" asp-route-id="@item.PostId" method="post" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="action-btn reject-btn" title="Từ chối"><i class="fas fa-times"></i></button>
+                                                </form>
+                                            }
+                                            else if (item.Status == TourismWeb.Models.PostStatus.Rejected)
+                                            {
+                                                <form asp-action="Approve" asp-route-id="@item.PostId" method="post" style="display: inline;">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="action-btn approve-btn" title="Duyệt"><i class="fas fa-check"></i></button>
+                                                </form>
+                                            }
+
+                                            <a asp-action="Delete" asp-route-id="@item.PostId" class="action-btn delete-btn" title="Xóa" onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không?');"><i class="fas fa-trash"></i></a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                index++; // Tăng số thứ tự sau mỗi bài viết
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>

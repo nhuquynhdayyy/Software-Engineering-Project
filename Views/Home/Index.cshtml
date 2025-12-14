@@ -1,0 +1,166 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Trang chủ";
+}
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" asp-append-version="true" />
+}
+
+@await Html.PartialAsync("_Carousel")
+
+<section class="mt-4">
+    <div class="container">
+        <h2 class="text-center">Khám phá</h2>
+        <p class="text-center">Những điểm đến hấp dẫn không thể bỏ lỡ</p>
+
+        @{
+            var recentSpots = ViewBag.RecentTouristSpots as List<TourismWeb.Models.TouristSpot>;
+            int spotCounter = 0;
+        }
+
+        @if (recentSpots != null && recentSpots.Any())
+        {
+            @for (int i = 0; i < recentSpots.Count; i += 3) 
+            {
+                <div class="row @(i > 0 ? "mt-4" : "")"> 
+                    @for (int j = 0; j < 3 && (i + j) < recentSpots.Count; j++) 
+                    {
+                        var spot = recentSpots[i + j];
+                        <div class="col-md-4">
+                            <a asp-controller="TouristSpots" asp-action="Details" asp-route-id="@spot.SpotId" class="text-decoration-none text-dark">
+                                <div class="card tour-card h-100 hover-shadow" style="cursor: pointer;">
+                                    <img src="@(string.IsNullOrEmpty(spot.ImageUrl) ? "/images/default-spotImage.png" : spot.ImageUrl)" class="card-img-top" alt="@spot.Name" style="height: 200px; object-fit: cover;">
+                                    <div class="card-body text-center">
+                                        <h5 class="card-title text-dark">@spot.Name.ToUpper()</h5>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                </div>
+                spotCounter += 3;
+            }
+        }
+        else
+        {
+            <p>Chưa có địa điểm nào để hiển thị.</p>
+        }
+    </div>
+    <section>
+    <div class="swiper-container">
+        <h2 class="text-center">Bài viết gần đây</h2>
+        <div class="swiper-wrapper">
+            @if (ViewBag.RecentPosts != null && ((List<TourismWeb.Models.Post>)ViewBag.RecentPosts).Any())
+            {
+                @foreach (var post in ViewBag.RecentPosts)
+                {
+                    <div class="swiper-slide">
+                        <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.PostId" class="text-decoration-none text-dark">
+                            <div class="slider-card clickable-card">
+                                <div class="slider-image-wrapper">
+                                    <img src="@(string.IsNullOrEmpty(post.ImageUrl) ? "/images/default-postImage.png" : post.ImageUrl)" alt="@post.Title">
+                                    <span class="slider-category @GetCategoryClass(post.TypeOfPost)">@post.TypeOfPost</span>
+                                </div>
+                                <div class="slider-content">
+                                    <div class="article-author">
+                                        <span class="author-name">@post.User.FullName</span>
+                                        <span class="post-date text-muted" style="font-size: 0.8em;"> - @post.CreatedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                    </div>
+                                    <h3 class="slider-title">@post.Title</h3>
+                                    <p class="slider-description">
+                                        @(post.Content.Length > 100 ? post.Content.Substring(0, 100) + "..." : post.Content)
+                                    </p>
+                                    <div class="slider-location">📍 @post.Spot.Name</div>
+                                    <div class="article-interactions">
+                                        <div class="interaction-item me-3 d-inline-block">
+                                            <span class="interaction-icon">❤️</span>
+                                            <span>@(post.PostFavorites?.Count ?? 0)</span>
+                                        </div>
+                                        <div class="interaction-item d-inline-block">
+                                            <span class="interaction-icon">💬</span>
+                                            <span>@(post.Comments?.Count ?? 0)</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="swiper-slide">
+                    <div class="slider-card">
+                        <div class="slider-content text-center">
+                            <p>Chưa có bài viết nào đã được duyệt.</p> 
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <!-- Chấm tròn pagination -->
+        <div class="swiper-pagination"></div>
+    </div>
+</section>
+
+    @await Html.PartialAsync("_Review")
+    <section class="guide-wrapper">
+        <div class="guide-section">
+            <div class="container"></div>
+            <h2><b>Cẩm Nang Du Lịch từ A - Z</b></h2>
+            <div class="divider">
+                <hr>
+                <div class="dots">
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                    <span class="dot"></span>
+                </div>
+                <hr>
+            </div>
+        </div>
+        <div class="guide-container">
+            <div class="container">
+                <div class="row">
+                    @if (ViewBag.GuidebookPosts != null && ViewBag.GuidebookPosts.Count > 0)
+                    {
+                        @foreach (var post in ViewBag.GuidebookPosts)
+                        {
+                            <div class="col-md-4 mb-4">
+                                <a asp-controller="Posts" asp-action="Details" asp-route-id="@post.PostId" class="destination-card text-decoration-none text-dark">
+                                    <div class="card h-100">
+                                        <img src="@post.ImageUrl" class="card-img-top" alt="@post.Title">
+                                        <div class="card-body">
+                                            <h5 class="card-title"><b>@post.Title</b></h5>
+                                            <p class="guide-date">@post.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                                            <p class="card-text">@(post.Content.Length > 100 ? post.Content.Substring(0, 100) + "..." : post.Content)</p>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="text-center py-4">
+                            <p>Chưa có bài viết cẩm nang nào.</p>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+    </section>
+</section>
+
+@functions {
+    public string GetCategoryClass(string typeOfPost)
+    {
+        return typeOfPost switch
+        {
+            "Cẩm nang" => "category-cam-nang",
+            "Trải nghiệm" => "category-trai-nghiem",
+            "Địa điểm" => "category-dia-diem",
+            _ => "category-default"
+        };
+    }
+}
