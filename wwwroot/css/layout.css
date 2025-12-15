@@ -65,7 +65,6 @@ img {
 }
 
 .navbar-dark .navbar-nav .nav-link {
-  /* Selector giữ nguyên, màu chữ đã đúng */
   color: #000000 !important; /* Chữ đen */
   font-weight: 600;
   font-size: 15px;
@@ -266,8 +265,7 @@ img {
   background-color: transparent !important; /* MODIFIED: Nền trong suốt khi cuộn */
   padding-top: 10px;
   padding-bottom: 10px;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); /* MODIFIED: Shadow khi cuộn, có thể giữ nguyên hoặc thay đổi */
-  /* Chữ vẫn giữ màu đen do các quy tắc !important ở trên */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15); 
 }
 
 /* Responsive Styles */
@@ -618,7 +616,7 @@ footer {
 } */
 
 .nav-item.dropdown {
-  position: relative !important; /* Giữ nguyên nếu cần thiết cho popper.js */
+  position: relative !important; 
 }
 
 .navbar-collapse {

@@ -537,7 +537,7 @@ body {
 .chart-container {
   position: relative;
   margin: auto;
-  height: 350px; /* Hoặc kích thước phù hợp với layout của bạn */
+  height: 350px; 
   width: 100%; /* Hoặc kích thước phù hợp */
 }
 

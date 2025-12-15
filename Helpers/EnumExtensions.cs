@@ -3,7 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using TourismWeb.Models; // Đảm bảo using namespace chứa các Enum của bạn
+using TourismWeb.Models; 
 
 namespace TourismWeb.Helpers
 {

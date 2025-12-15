@@ -40,7 +40,7 @@
                             <!-- Left Column - Text Inputs -->
                             <div class="col-lg-8 order-lg-1 order-2">
                                 <div class="card shadow-sm border-0 rounded-3 bg-light bg-opacity-50 p-4 h-100">
-                                    <!-- Tiêu đề, Địa điểm, Loại bài viết (giữ nguyên) -->
+                                    <!-- Tiêu đề, Địa điểm, Loại bài viết -->
                                     <div class="mb-4">
                                         <label asp-for="Title" class="form-label fw-bold text-primary">
                                             <i class="fas fa-heading me-2"></i>Tiêu đề bài viết
@@ -78,12 +78,12 @@
                                         </div>
                                     </div>
 
-                                    <!-- Nội dung chi tiết (giữ nguyên) -->
+                                    <!-- Nội dung chi tiết -->
                                     <div class="mb-4">
                                         <label asp-for="Content" class="form-label fw-bold text-primary">
                                             <i class="fas fa-align-left me-2"></i>Nội dung chi tiết
                                         </label>
-                                        <!-- Editor Toolbar và Textarea (giữ nguyên) -->
+                                        <!-- Editor Toolbar và Textarea -->
                                         <div class="editor-toolbar border-0 shadow-sm rounded-top bg-white p-2 mb-0">
                                             <!-- Buttons... -->
                                         </div>
@@ -290,13 +290,13 @@
                                 </div> <!-- Kết thúc card Left Column -->
                             </div> <!-- Kết thúc Left Column -->
 
-                            <!-- Right Column - Image Upload and Tags (giữ nguyên) -->
+                            <!-- Right Column - Image Upload and Tags -->
                             <div class="col-lg-4 order-lg-2 order-1">
                                 <div class="card shadow-sm border-0 rounded-3 bg-light bg-opacity-50 p-4 mb-4">
                                     <h5 class="card-title fw-bold text-primary mb-3">
                                         <i class="fas fa-image me-2"></i>Ảnh bìa bài viết
                                     </h5>
-                                    <!-- Image Upload Container (giữ nguyên) -->
+                                    <!-- Image Upload Container -->
                                     <div class="image-upload-container bg-white rounded-3 shadow-sm p-3 text-center mb-3 position-relative"
                                         style="height: 240px; cursor: pointer;" id="imageUploadContainer">
                                         <!-- img preview -->
@@ -341,21 +341,21 @@
                                         hơn. Nên sử dụng ảnh có tỷ lệ 16:9.
                                     </small>
                                 </div>
-                                <!-- Card thông tin bổ sung (giữ nguyên) -->
+                                <!-- Card thông tin bổ sung -->
                                 @* <div class="card shadow-sm border-0 rounded-3 bg-light bg-opacity-50 p-4">
                                     <h5 class="card-title fw-bold text-primary mb-3">
                                         <i class="fas fa-info-circle me-2"></i>Thông tin bổ sung
                                     </h5>
-                                    <!-- Tags, Nổi bật (giữ nguyên) -->
+                                    <!-- Tags, Nổi bật -->
                                     <!-- Lưu ý: Phần Tags và Nổi bật này chưa được xử lý ở backend -->
                                 </div> *@
                             </div> <!-- Kết thúc Right Column -->
                         </div> <!-- Kết thúc row g-4 -->
 
-                        <!-- Submit Buttons (giữ nguyên) -->
+                        <!-- Submit Buttons -->
                         <div class="mt-4 p-3 bg-light rounded-3 shadow-sm">
                             <div class="row align-items-center">
-                                <!-- Checkbox và Buttons (giữ nguyên) -->
+                                <!-- Checkbox và Buttons -->
                                 <div class="col-md-6">
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="agreeTerms" required>
@@ -418,7 +418,7 @@
             // Gọi lần đầu khi load trang (quan trọng khi có lỗi validation và trang load lại)
             toggleFields();
 
-            // --- Phần xử lý ảnh preview và hover (giữ nguyên) ---
+            // --- Phần xử lý ảnh preview và hover ---
             const imageUpload = document.getElementById('imageUpload');
             const imagePreview = document.getElementById('imagePreview');
             const imageContainer = document.getElementById('imageUploadContainer');
@@ -454,7 +454,7 @@
                     imageUpload.click();
                 });
             }
-            // --- Phần xử lý nút editor toolbar (giữ nguyên) ---
+            // --- Phần xử lý nút editor toolbar ---
             document.querySelectorAll('.editor-toolbar .btn').forEach(button => {
                 button.addEventListener('click', function (e) {
                     e.preventDefault();

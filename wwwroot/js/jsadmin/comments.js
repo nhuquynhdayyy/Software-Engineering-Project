@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", function () {
-  // Tabs Navigation - Phiên bản đã sửa
+  // Tabs Navigation
   const tabButtons = document.querySelectorAll(".tab-list button");
 
   console.log("Script quản lý bình luận đã được khởi tạo");

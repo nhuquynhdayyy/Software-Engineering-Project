@@ -5,7 +5,6 @@
 }
 
 <style>
-    /* CSS giữ nguyên như phiên bản trước đó bạn đã có */
     :root {
         --primary-color: #2563eb;
         --primary-hover: #1d4ed8;
@@ -159,7 +158,6 @@
         /* Để input chiếm phần còn lại */
     }
 
-    /* Phần còn lại của CSS giữ nguyên ... */
     .image-preview-container {
         background: #f7f9fc;
         border: 2px dashed var(--border-color);
@@ -398,21 +396,21 @@
                 </h4>
                 <div class="row">
                     <div class="col-lg-7">
-                        <!-- Tên địa điểm - ĐÃ SỬA BỎ ICON -->
+                        <!-- Tên địa điểm -->
                         <div class="mb-3-custom">
                             <label asp-for="Name" class="form-label">Tên địa điểm <span
                                     class="text-danger">*</span></label>
                             <input asp-for="Name" class="form-control" placeholder="Nhập tên địa điểm du lịch" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
-                        <!-- Địa chỉ - ĐÃ SỬA BỎ ICON -->
+                        <!-- Địa chỉ -->
                         <div class="mb-3-custom">
                             <label asp-for="Address" class="form-label">Địa chỉ <span
                                     class="text-danger">*</span></label>
                             <input asp-for="Address" class="form-control" placeholder="Nhập địa chỉ chi tiết" />
                             <span asp-validation-for="Address" class="text-danger"></span>
                         </div>
-                        <!-- Danh mục - ĐÃ SỬA BỎ ICON -->
+                        <!-- Danh mục -->
                         <div class="mb-3-custom">
                             <label asp-for="CategoryId" class="form-label">Danh mục <span
                                     class="text-danger">*</span></label>
@@ -423,7 +421,7 @@
                         </div>
                     </div>
 
-                    <!-- Phần Hình ảnh (giữ nguyên như lần sửa trước) -->
+                    <!-- Phần Hình ảnh -->
                     <div class="col-lg-5">
                         <div class="mb-3-custom">
                             <div class="row mb-2 align-items-start">
@@ -476,7 +474,7 @@
                 </div>
             </div>
 
-            <!-- Thông tin bổ sung (giữ nguyên như lần sửa trước) -->
+            <!-- Thông tin bổ sung -->
             <div class="form-section">
                 <h4 class="form-section-title">
                     <i class="fas fa-info"></i>
@@ -560,7 +558,6 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
     <script>
-        // JavaScript giữ nguyên
         document.addEventListener('DOMContentLoaded', function () {
             const fileInput = document.getElementById('imageUploadFile');
             const imagePreview = document.getElementById('imagePreview');

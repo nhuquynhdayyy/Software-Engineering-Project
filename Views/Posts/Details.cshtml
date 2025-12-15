@@ -8,7 +8,7 @@
     ViewData["Title"] = Model.Title; // Lấy tiêu đề động
     string postType = Model.TypeOfPost; // Lấy loại bài viết động
 
-    // Define theme colors and icons based on post type (Logic này giữ nguyên)
+    // Define theme colors and icons based on post type 
     string themeColor = "";
     string themeClass = "";
     string themeIcon = ""; // Icon class (e.g., bi-palm-tree)
@@ -31,7 +31,7 @@
        // themeIconName = "quả cam";
     }
 
-    // Lấy UserId và kiểm tra trạng thái yêu thích (Logic này giữ nguyên)
+    // Lấy UserId và kiểm tra trạng thái yêu thích 
     var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
     var userId = userIdClaim != null && int.TryParse(userIdClaim.Value, out int id) ? id : 0;
     var isFavorited = Model.PostFavorites?.Any(f => f.UserId == userId) == true;

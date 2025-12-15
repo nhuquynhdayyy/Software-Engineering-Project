@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // Mobile sidebar toggle (giữ nguyên)
+  // Mobile sidebar toggle 
   const toggleSidebarBtn = document.querySelector(".toggle-sidebar");
   if (toggleSidebarBtn) {
     toggleSidebarBtn.addEventListener("click", () => {
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // Export report button (giữ nguyên logic alert, hoặc triển khai thực tế)
+  // Export report button 
   const exportReportBtn = document.getElementById("exportReportBtn");
   if (exportReportBtn) {
     exportReportBtn.addEventListener("click", () => {

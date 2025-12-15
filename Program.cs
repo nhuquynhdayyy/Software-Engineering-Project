@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using TourismWeb.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.Extensions.Logging.Console;
-using TourismWeb.Services; // <<--- THÊM USING CHO SERVICE CỦA BẠN
+using TourismWeb.Services; 
 
 var builder = WebApplication.CreateBuilder(args);
 

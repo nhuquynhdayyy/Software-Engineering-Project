@@ -1189,7 +1189,7 @@ public async Task<IActionResult> Users(int pageNumber = 1, int pageSize = 10, st
         {
             if (request.Type == "Review")
             {
-                var review = await _context.Reviews.FindAsync(request.Id); // Sửa Reviews thành tên DbSet của bạn
+                var review = await _context.Reviews.FindAsync(request.Id); 
                 if (review == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy đánh giá để xóa." });
@@ -1198,7 +1198,7 @@ public async Task<IActionResult> Users(int pageNumber = 1, int pageSize = 10, st
             }
             else if (request.Type == "PostComment")
             {
-                var comment = await _context.PostComments.FindAsync(request.Id); // Sửa PostComments thành tên DbSet của bạn
+                var comment = await _context.PostComments.FindAsync(request.Id); 
                 if (comment == null)
                 {
                     return Json(new { success = false, message = "Không tìm thấy bình luận để xóa." });

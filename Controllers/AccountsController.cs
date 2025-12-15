@@ -17,8 +17,7 @@ using TourismWeb.Services; // Namespace của IEmailSender (BẠN CẦN TẠO V�
 using Google.Apis.Auth; // Cho Google Sign-In
 using System.Security.Cryptography; // Cho RandomNumberGenerator
 
-// ĐẢM BẢO USING NÀY ĐÚNG VỚI THƯ MỤC VÀ NAMESPACE CỦA CÁC VIEWMODEL CỦA BẠN
-using TourismWeb.Models.ViewModels; // Ví dụ: Nếu ViewModel của bạn nằm trong Models/ViewModels
+using TourismWeb.Models.ViewModels; 
 
 namespace TourismWeb.Controllers
 {
